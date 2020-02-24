@@ -7,6 +7,7 @@ package model.pokemon;
  */
 public class Pokemon
 {
+    private int id;
     private String name;
     private int hp;
     private int catchLikelihood;
@@ -15,18 +16,30 @@ public class Pokemon
 
 
     /**
-     * Pokemon (String, int, int, int)
+     * Pokemon (int, String, int, int, int)
      *
      * Purpose: Creates a new Pokemon with the given parameters.
      */
-    public Pokemon (String name, int hp, int catchLikelihood, int runLikelihood, int maxDuration)
+    public Pokemon(int id, String name, int hp, int catchLikelihood, int runLikelihood, int maxDuration)
     {
+        this.id = id;
         this.name = name;
         this.hp = hp;
         this.catchLikelihood = catchLikelihood;
         this.runLikelihood = runLikelihood;
         this.maxDuration = maxDuration;
     } // Pokemon (String, int, int, int)
+
+
+    /**
+     * getID()
+     *
+     * Purpose: Returns the ID of the Pokemon.
+     */
+    public int getID()
+    {
+        return this.id;
+    } // getID()
 
 
     /**

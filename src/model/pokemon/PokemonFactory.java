@@ -39,11 +39,12 @@ public class PokemonFactory
     private static String getPokemonLine (final String filename, final int maxLines)
     {
         final Random r = new Random();
-        final int selectedPokemonID = r.nextInt(maxLines)+1;
+        final int selectedPokemonID = r.nextInt(maxLines);
+        //System.out.print(selectedPokemonID);
         String selectedPokemonLine = "";
         try {
             BufferedReader bf = new BufferedReader(new FileReader(filename));
-            for (int i = 0; i < selectedPokemonID; i++)
+            for (int i = 0; i <= selectedPokemonID; i++)
                 selectedPokemonLine = bf.readLine();
             bf.close();
         } catch (Exception e) {
@@ -61,12 +62,13 @@ public class PokemonFactory
      */
     private static Pokemon createPokemon (final String[] pokemonInfo)
     {
-        final String name = pokemonInfo[0];
-        final int hp = Integer.parseInt(pokemonInfo[1]);
-        final int catchPercent = Integer.parseInt(pokemonInfo[2]);
-        final int runPercent = Integer.parseInt(pokemonInfo[3]);
-        final int maxDuration = Integer.parseInt(pokemonInfo[4]);
-        return new Pokemon(name, hp, catchPercent, runPercent, maxDuration);
+        final int id = Integer.parseInt(pokemonInfo[0]);
+        final String name = pokemonInfo[1];
+        final int hp = Integer.parseInt(pokemonInfo[2]);
+        final int catchPercent = Integer.parseInt(pokemonInfo[3]);
+        final int runPercent = Integer.parseInt(pokemonInfo[4]);
+        final int maxDuration = Integer.parseInt(pokemonInfo[5]);
+        return new Pokemon(id, name, hp, catchPercent, runPercent, maxDuration);
     } // createPokemon()
 
 } // class PokemonFactory

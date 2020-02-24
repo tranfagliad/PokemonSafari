@@ -1,6 +1,6 @@
-Rattata, 40, 60, 15, 20
-Pidgey, 35, 60, 15, 20
-Spearow, 45, 60, 15, 20
-Caterpie, 25, 60, 15, 20
-Weedle, 25, 60, 15, 20
-Ekans, 40, 60, 15, 20
+0, Rattata, 40, 60, 15, 20
+1, Pidgey, 35, 60, 15, 20
+2, Spearow, 45, 60, 15, 20
+3, Caterpie, 25, 60, 15, 20
+4, Weedle, 25, 60, 15, 20
+5, Ekans, 40, 60, 15, 20
