@@ -10,11 +10,11 @@ import java.util.List;
  *
  * Purpose: Represents the Player in the game.
  */
-public class Player
-{
+public class Player {
     private static final int INITIAL_NUM_SAFARI_BALLS = 30;
-    private static final int INITIAL_STEPS_REMAINING  = 500;
+    private static final int INITIAL_STEPS_REMAINING = 500;
 
+    private String name;
     private int numSafariBalls;
     private int stepsRemaining;
     private Position2D position;
@@ -24,17 +24,29 @@ public class Player
     /**
      * Player ()
      *
-     * Purpose: Creates and initializes a Player with 30 safari balls,
-     *      500 steps remaining, and an empty Pokemon list. The initial
-     *      position of the Player is (0,0).
+     * Purpose: Creates and initializes a Player with a the given name,
+     * 30 safari balls, 500 steps remaining, an empty Pokemon list.
+     * The initial position of the Player is (0,0).
      */
-    public Player ()
+    public Player(String name)
     {
+        this.name = name;
         this.numSafariBalls = INITIAL_NUM_SAFARI_BALLS;
         this.stepsRemaining = INITIAL_STEPS_REMAINING;
         this.position = new Position2D();
         this.pokemonCaught = new ArrayList<>();
     } // Player ()
+
+
+    /**
+     * getName()
+     *
+     * Purpose: Returns the name of the Player.
+     */
+    public String getName()
+    {
+        return this.name;
+    } // getName()
 
 
     /**
