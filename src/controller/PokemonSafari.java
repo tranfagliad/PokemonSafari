@@ -52,7 +52,7 @@ public class PokemonSafari extends Application
     public void start (Stage window) throws Exception
     {
         initWindow(window);
-        PokemonSafari.goToNextScene(new BattleScene(new Player("Daniel"), PokemonFactory.getPokemon(Rarity.Rare)));
+        PokemonSafari.goToNextScene(new BattleScene(new Player("Daniel"), PokemonFactory.getPokemon(Rarity.Common)));
         window.show();
     } // start()
 

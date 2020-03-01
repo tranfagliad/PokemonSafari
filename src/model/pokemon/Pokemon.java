@@ -10,6 +10,8 @@ public class Pokemon
     private int id;
     private String name;
     private int hp;
+    private int level;
+    private Gender gender;
     private int catchLikelihood;
     private int runLikelihood;
     private int maxDuration;
@@ -20,11 +22,14 @@ public class Pokemon
      *
      * Purpose: Creates a new Pokemon with the given parameters.
      */
-    public Pokemon(int id, String name, int hp, int catchLikelihood, int runLikelihood, int maxDuration)
+    public Pokemon(int id, String name, int hp, int level, Gender gender,
+                   int catchLikelihood, int runLikelihood, int maxDuration)
     {
         this.id = id;
         this.name = name;
         this.hp = hp;
+        this.level = level;
+        this.gender = gender;
         this.catchLikelihood = catchLikelihood;
         this.runLikelihood = runLikelihood;
         this.maxDuration = maxDuration;
@@ -62,6 +67,28 @@ public class Pokemon
     {
         return this.hp;
     } // getHp()
+
+
+    /**
+     * getLevel()
+     *
+     * Purpose: Returns the level of the Pokemon.
+     */
+    public int getLevel ()
+    {
+        return this.level;
+    } // getLevel()
+
+
+    /**
+     * getGender()
+     *
+     * Purpose: Returns the gender of the Pokemon.
+     */
+    public Gender getGender ()
+    {
+        return this.gender;
+    } // getGender()
 
 
     /**

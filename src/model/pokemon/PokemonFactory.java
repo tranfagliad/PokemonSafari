@@ -15,6 +15,9 @@ public class PokemonFactory
     private static final int NUM_UNCOMMON = 3;
     private static final int NUM_RARE     = 1;
 
+    private static final int MIN_LEVEL = 25;
+    private static final int MAX_LEVEL = 30;
+
 
     /**
      * getPokemon()
@@ -58,17 +61,32 @@ public class PokemonFactory
      * createPokemon()
      *
      * Purpose: Given an array of Pokemon data, the data is parsed, and a Pokemon
-     *      object is created and returned.
+     *      object is created with a random level and gender, then returned.
      */
     private static Pokemon createPokemon (final String[] pokemonInfo)
     {
+        final Random r = new Random();
         final int id = Integer.parseInt(pokemonInfo[0]);
         final String name = pokemonInfo[1];
-        final int hp = Integer.parseInt(pokemonInfo[2]);
+        final int level = r.nextInt(MAX_LEVEL-MIN_LEVEL+1)+MIN_LEVEL;
+        final int hp = calcHP(level, Integer.parseInt(pokemonInfo[2]));
         final int catchPercent = Integer.parseInt(pokemonInfo[3]);
         final int runPercent = Integer.parseInt(pokemonInfo[4]);
         final int maxDuration = Integer.parseInt(pokemonInfo[5]);
-        return new Pokemon(id, name, hp, catchPercent, runPercent, maxDuration);
+        final Gender gender = r.nextInt(2) == 0 ? Gender.Male : Gender.Female;
+        return new Pokemon(id, name, hp, level, gender, catchPercent, runPercent, maxDuration);
     } // createPokemon()
+
+
+    /**
+     * calcHP()
+     *
+     * Purpose: Calculates the actual HP stat of a Pokemon using the level
+     *      and base HP stats.
+     */
+    private static int calcHP (int level, int baseHP)
+    {
+        return ((2 * baseHP * level) / 100) + level + 10;
+    } // calcHP()
 
 } // class PokemonFactory
