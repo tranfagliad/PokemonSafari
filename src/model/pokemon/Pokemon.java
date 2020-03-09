@@ -5,7 +5,7 @@ package model.pokemon;
  *
  * Purpose: Model for a Pokemon in the game.
  */
-public class Pokemon
+public final class Pokemon
 {
     private int id;
     private String name;
@@ -158,4 +158,4 @@ public class Pokemon
         return this.name+": { HP: "+this.hp+", Catch: "+this.catchLikelihood+"%, Run: "+this.runLikelihood+"%, Duration: "+this.maxDuration+" }";
     } // toString()
 
-} // class Pokemon
+} // final class Pokemon

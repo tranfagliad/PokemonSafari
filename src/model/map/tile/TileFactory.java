@@ -5,7 +5,7 @@ package model.map.tile;
  *
  * Purpose: Used to create tiles.
  */
-public class TileFactory
+public final class TileFactory
 {
     /**
      * getTile()
@@ -28,4 +28,4 @@ public class TileFactory
         return new EmptyTile();
     } // getTile()
 
-} // class TileFactory
+} // final class TileFactory

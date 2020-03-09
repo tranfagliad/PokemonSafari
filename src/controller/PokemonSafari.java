@@ -1,5 +1,6 @@
 package controller;
 
+import controller.audio.CryPlayer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -20,7 +21,7 @@ import java.io.IOException;
  *
  * Purpose: The central module of the Pokemon Safari game.
  */
-public class PokemonSafari extends Application
+public final class PokemonSafari extends Application
 {
     private static final String ICON_FILENAME = "images/icons/safari_ball.png";
     private static final String WINDOW_TITLE = "Pokemon Safari";
@@ -52,6 +53,7 @@ public class PokemonSafari extends Application
     public void start (Stage window) throws Exception
     {
         initWindow(window);
+        initMediaPlayers();
         PokemonSafari.goToNextScene(new BattleScene(new Player("Daniel"), PokemonFactory.getPokemon(Rarity.Common)));
         window.show();
     } // start()
@@ -74,6 +76,19 @@ public class PokemonSafari extends Application
         window.initStyle(StageStyle.UNDECORATED);
         window.setScene(scene);
     } // initWindow()
+
+
+    /**
+     * initMediaPlayers()
+     *
+     * Purpose: Calls getInstance on all media players to initialize them.
+     */
+    private void initMediaPlayers ()
+    {
+        CryPlayer.getInstance();
+        //MusicPlayer.getInstance();
+        //SfxPlayer.getInstance();
+    } // initMediaPlayers()
 
 
     /**
@@ -107,20 +122,7 @@ public class PokemonSafari extends Application
     {
         GameSceneManager.addScene(nextScene);
         root.getChildren().add(nextScene);
-        GameSceneManager.getActiveScene().drawFrame();
+        GameSceneManager.getActiveScene().start();
     } // goToNextScene()
 
-
-    /**
-     * goToPreviousScene()
-     *
-     * Purpose: Starts the previous scene.
-     */
-    public static void goToPreviousScene ()
-    {
-        root.getChildren().remove(root.getChildren().size()-1);
-        GameSceneManager.removeScene();
-        GameSceneManager.getActiveScene().drawFrame();
-    } // goToPreviousScene()
-
-} // class PokemonSafari
+} // final class PokemonSafari

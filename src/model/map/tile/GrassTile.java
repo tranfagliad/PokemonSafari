@@ -5,7 +5,7 @@ package model.map.tile;
  *
  * Purpose: Represents a tile of grass without tall grass.
  */
-public class GrassTile extends AbstractTile
+public final class GrassTile extends AbstractTile
 {
     /**
      * GrassTile ()
@@ -17,4 +17,4 @@ public class GrassTile extends AbstractTile
         super(1, true, false);
     } // GrassTile ()
 
-} // class GrassTile
+} // final class GrassTile

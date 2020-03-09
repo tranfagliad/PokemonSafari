@@ -10,7 +10,7 @@ import java.util.Stack;
  * Purpose: Provides an interface to manage game scenes.
  *      The scenes are managed in a Stack structure.
  */
-public class GameSceneManager
+public final class GameSceneManager
 {
     private static Stack<GameScene> scenes = new Stack<>();
 
@@ -49,4 +49,4 @@ public class GameSceneManager
         scenes.pop();
     } // removeScene()
 
-} // class GameSceneManager
+} // final class GameSceneManager

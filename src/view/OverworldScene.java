@@ -6,17 +6,17 @@ package view;
  * Purpose: Displays and operates the overworld scene that
  *      the player walks around in.
  */
-public class OverworldScene extends GameScene
+public final class OverworldScene extends GameScene
 {
     /**
-     * drawFrame()
+     * start()
      *
-     * Purpose: Draws a single frame of the overworld.
+     * Purpose: Defines how the OverworldScene starts.
      */
     @Override
-    public void drawFrame ()
+    public void start ()
     {
 
-    } // drawFrame()
+    } // start()
 
-} // class OverworldScene
+} // final class OverworldScene

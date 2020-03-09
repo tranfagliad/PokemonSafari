@@ -5,7 +5,7 @@ package model.map.tile;
  *
  * Purpose: Represents a tile of water with a piece of bridge over it.
  */
-public class WaterBridgeTile extends AbstractTile
+public final class WaterBridgeTile extends AbstractTile
 {
     /**
      * WaterBridgeTile ()
@@ -17,4 +17,4 @@ public class WaterBridgeTile extends AbstractTile
         super(8, true, false);
     } // WaterBridgeTile ()
 
-} // class WaterBridgeTile
+} // final class WaterBridgeTile

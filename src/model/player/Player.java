@@ -10,7 +10,9 @@ import java.util.List;
  *
  * Purpose: Represents the Player in the game.
  */
-public class Player {
+public final class Player
+{
+
     private static final int INITIAL_NUM_SAFARI_BALLS = 30;
     private static final int INITIAL_STEPS_REMAINING = 500;
 
@@ -127,4 +129,4 @@ public class Player {
         return "Player: { Balls: "+this.numSafariBalls+", Steps: "+this.stepsRemaining+", Position: "+this.position.toString()+", Pokemon: "+this.pokemonCaught.toString()+" }";
     } // toString()
 
-} // class Player
+} // final class Player

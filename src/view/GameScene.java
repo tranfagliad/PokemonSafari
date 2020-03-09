@@ -14,7 +14,9 @@ public abstract class GameScene extends Canvas
 
 
     /**
+     * GameScene ()
      *
+     * Purpose: Super-constructor that creates and initializes a GameScene.
      */
     protected GameScene ()
     {
@@ -23,19 +25,21 @@ public abstract class GameScene extends Canvas
 
 
     /**
-     * drawFrame()
+     * start()
      *
-     * Purpose: Draws a single frame of the scene.
+     * Purpose: Defines what will happen when this GameScene is started.
      */
-    public abstract void drawFrame ();
+    public abstract void start ();
 
 
     /**
+     * getPaintBrush()
      *
+     * Purpose: Returns the GraphicsContext of the canvas to allow drawing.
      */
     public GraphicsContext getPaintBrush ()
     {
         return this.paintBrush;
-    }
+    } // getPaintBrush()
 
 } // abstract class GameScene

@@ -13,7 +13,7 @@ import java.util.List;
  *
  * Purpose: Used to create Maps for the game.
  */
-public class MapBuilder
+public final class MapBuilder
 {
     /**
      * createMap()
@@ -47,4 +47,4 @@ public class MapBuilder
         return new Map(tiles);
     } // createMap()
 
-} // class MapBuilder
+} // final class MapBuilder

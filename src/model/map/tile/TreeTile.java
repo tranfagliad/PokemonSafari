@@ -10,7 +10,7 @@ package model.map.tile;
  *          ID == 5: Bottom-Left
  *          ID == 6: Bottom-Right
  */
-public class TreeTile extends AbstractTile
+public final class TreeTile extends AbstractTile
 {
     private static final String ILLEGAL_ID_MSG = "ID must be between 3 and 6, inclusive.";
 
@@ -40,4 +40,4 @@ public class TreeTile extends AbstractTile
         return retStr;
     } // toString()
 
-} // TreeTile (int)
+} // final TreeTile (int)

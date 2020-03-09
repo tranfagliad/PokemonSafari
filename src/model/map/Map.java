@@ -9,7 +9,7 @@ import java.util.List;
  *
  * Purpose: Represents a map of tiles in the game.
  */
-public class Map
+public final class Map
 {
     private static final int MIN_SIZE = 11;
     private static final String ILLEGAL_SIZE_MSG = "Map must be a square grid, and at least "+MIN_SIZE+"x"+MIN_SIZE+" in size.";
@@ -94,4 +94,4 @@ public class Map
         return retStr;
     } // toString()
 
-} // class Map
+} // final class Map

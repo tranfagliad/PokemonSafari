@@ -1,4 +1,11 @@
 package controller.audio;
 
-public class MusicPlayer {
-}
+/**
+ * MusicPlayer.java
+ *
+ * Purpose: Media player singleton to play background music.
+ */
+public final class MusicPlayer
+{
+
+} // final class MusicPlayer

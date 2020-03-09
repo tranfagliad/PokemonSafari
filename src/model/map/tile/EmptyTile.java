@@ -5,7 +5,7 @@ package model.map.tile;
  *
  * Purpose: Represents an empty tile.
  */
-public class EmptyTile extends AbstractTile
+public final class EmptyTile extends AbstractTile
 {
     /**
      * EmptyTile ()
@@ -17,4 +17,4 @@ public class EmptyTile extends AbstractTile
         super(0, false, false);
     } // EmptyTile ()
 
-} // class EmptyTile
+} // final class EmptyTile

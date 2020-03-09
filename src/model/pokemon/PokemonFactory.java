@@ -9,7 +9,7 @@ import java.util.Random;
  *
  * Purpose: Used to create Pokemon.
  */
-public class PokemonFactory
+public final class PokemonFactory
 {
     private static final int NUM_COMMON   = 6;
     private static final int NUM_UNCOMMON = 3;
@@ -84,9 +84,9 @@ public class PokemonFactory
      * Purpose: Calculates the actual HP stat of a Pokemon using the level
      *      and base HP stats.
      */
-    private static int calcHP (int level, int baseHP)
+    private static int calcHP (final int level, final int baseHP)
     {
         return ((2 * baseHP * level) / 100) + level + 10;
     } // calcHP()
 
-} // class PokemonFactory
+} // final class PokemonFactory
