@@ -54,7 +54,7 @@ public final class PokemonSafari extends Application
     {
         initWindow(window);
         initMediaPlayers();
-        PokemonSafari.goToNextScene(new BattleScene(new Player("Daniel"), PokemonFactory.getPokemon(Rarity.Rare)));
+        PokemonSafari.goToNextScene(new BattleScene(new Player("Daniel"), PokemonFactory.getPokemon(Rarity.Uncommon)));
         window.show();
     } // start()
 
