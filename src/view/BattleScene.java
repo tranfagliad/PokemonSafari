@@ -11,6 +11,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 import javafx.scene.text.Font;
 import model.player.Player;
+import model.pokemon.Gender;
 import model.pokemon.Pokemon;
 
 import java.io.FileInputStream;
@@ -30,18 +31,38 @@ public final class BattleScene extends GameScene
     private static final String PLAYER_IMAGE_FILENAME       = "images/battle/trainer_battle_sprites.png";
     private static final String BATTLE_ITEMS_IMAGE_FILENAME = "images/battle/battle_items.png";
 
-    private static final double SRC_WILD_POKEMON_IMAGE_SIZE = 100;
+    private static final double SRC_WILD_POKEMON_IMAGE_SIZE = 100.0;
     private static final double DEST_WILD_POKEMON_IMAGE_SIZE = SRC_WILD_POKEMON_IMAGE_SIZE * 3;
-    private static final double WILD_POKEMON_X = 490;
-    private static final double WILD_POKEMON_Y = 20;
+    private static final double WILD_POKEMON_X = 490.0;
+    private static final double WILD_POKEMON_Y = 20.0;
 
-    private static final double SRC_PLAYER_IMAGE_SIZE = 70;
+    private static final double SRC_PLAYER_IMAGE_SIZE = 70.0;
     private static final double DEST_PLAYER_IMAGE_SIZE = SRC_PLAYER_IMAGE_SIZE * 3.5;
-    private static final double PLAYER_X = 100;
-    private static final double PLAYER_Y = 278;
+    private static final double PLAYER_X = 100.0;
+    private static final double PLAYER_Y = 278.0;
+
+    private static final double MALE_GENDER_Y = 70.0;
+    private static final double FEMALE_GENDER_Y = 120.0;
 
     private static final Font BIG_FONT = Font.font("Verdana", 32);
     private static final Font SMALL_FONT = Font.font("Verdana", 25);
+
+    private static double wildPokemonSourceX;
+    private static double wildPokemonSourceY;
+
+    private static double genderSourceX;
+    private static double genderSourceY;
+    private static double genderDestX;
+
+    private static double actionArrowX = 475;
+    private static double actionArrowY = 566;
+    private static int menuRow = 0;
+    private static int menuCol = 0;
+    private static final double ARROW_TOP = 566.0;
+    private static final double ARROW_BOTTOM = 636.0;
+    private static final double ARROW_LEFT = 475.0;
+    private static final double ARROW_RIGHT = 665.0;
+    private static double currArrowX = ARROW_LEFT;
 
     private Image backgroundImage;
     private Image battleBoxImage;
@@ -52,29 +73,24 @@ public final class BattleScene extends GameScene
     private Player player;
     private Pokemon wildPokemon;
 
-    private int wildPokemonSourceX;
-    private int wildPokemonSourceY;
-
-    private double actionArrowX = 475;
-    private double actionArrowY = 566;
-    private int menuRow = 0;
-    private int menuCol = 0;
-
 
     /**
      * BattleScene (Pokemon)
      *
      * Purpose: Creates and initializes the BattleScene for the given Pokemon.
      */
-    public BattleScene (Player player, Pokemon wildPokemon)
+    public BattleScene (final Player player, final Pokemon wildPokemon)
     {
         super();
 
         this.player = player;
         this.wildPokemon = wildPokemon;
 
-        this.wildPokemonSourceX = (int)((wildPokemon.getID() % 5) * SRC_WILD_POKEMON_IMAGE_SIZE);
-        this.wildPokemonSourceY = (int)((wildPokemon.getID() / 5) * SRC_WILD_POKEMON_IMAGE_SIZE);
+        wildPokemonSourceX = (int)((wildPokemon.getID() % 5) * SRC_WILD_POKEMON_IMAGE_SIZE);
+        wildPokemonSourceY = (int)((wildPokemon.getID() / 5) * SRC_WILD_POKEMON_IMAGE_SIZE);
+        genderSourceX = 0;
+        genderSourceY = this.wildPokemon.getGender() == Gender.Male ? MALE_GENDER_Y : FEMALE_GENDER_Y;
+        genderDestX = (wildPokemon.getName().length()*20)+60;
         this.getPaintBrush().setFont(BIG_FONT);
 
         try {
@@ -137,7 +153,7 @@ public final class BattleScene extends GameScene
          * Purpose: Defines how every frame in the transition is drawn.
          */
         @Override
-        public void handle (long now)
+        public void handle (final long now)
         {
             if (arcExtent == 0.0)
             {
@@ -161,7 +177,7 @@ public final class BattleScene extends GameScene
             else if (arcExtent < MIN_ANGLE)
                 arcExtent = MAX_ANGLE;
             //System.out.println(arcExtent);
-            if (arcExtent >= 0.0)
+            if (arcExtent > 0.0)
             {
                 getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
                 getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
@@ -186,7 +202,7 @@ public final class BattleScene extends GameScene
         final AnimationTimer standby = new StandbyAnimationTimer();
         this.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
-            public void handle(KeyEvent event)
+            public void handle(final KeyEvent event)
             {
                 if (event.getCode() == KeyCode.SPACE)
                 {
@@ -217,7 +233,7 @@ public final class BattleScene extends GameScene
          *
          */
         @Override
-        public void handle (long now)
+        public void handle (final long now)
         {
             getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
             getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
@@ -246,7 +262,7 @@ public final class BattleScene extends GameScene
         final AnimationTimer enterBattlePhase = new EnterBattlePhaseAnimationTimer();
         this.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
-            public void handle(KeyEvent event) { /* Do nothing */ }
+            public void handle(final KeyEvent event) { /* Do nothing */ }
         });
         enterBattlePhase.start();
     }
@@ -263,30 +279,35 @@ public final class BattleScene extends GameScene
 
         private double playerBattleBoxX = 880;
         private double pokemonBattleBoxX = -400;
+        private double genderX = genderDestX - 440;
 
 
         @Override
-        public void handle (long now)
+        public void handle (final long now)
         {
             getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
             getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
             getPaintBrush().drawImage(pokemonImage, wildPokemonSourceX, wildPokemonSourceY, SRC_WILD_POKEMON_IMAGE_SIZE, SRC_WILD_POKEMON_IMAGE_SIZE, WILD_POKEMON_X, WILD_POKEMON_Y, DEST_WILD_POKEMON_IMAGE_SIZE, DEST_WILD_POKEMON_IMAGE_SIZE);
 
-            getPaintBrush().drawImage(battleBoxImage, 0, 0, 103, 36, playerBattleBoxX, 360, 103<<2, 36<<2);
-            getPaintBrush().fillText("Safari Balls", playerBattleBoxX+80, 410);
-            getPaintBrush().fillText("Left: " + player.getNumSafariBalls(), playerBattleBoxX+120, 460);
-            getPaintBrush().drawImage(battleBoxImage, 0, 175, 18, 18, playerBattleBoxX+280, 410, 18<<1, 18<<1);
+            getPaintBrush().drawImage(battleBoxImage, 0, 0, 103, 36, this.playerBattleBoxX, 360, 412, 144);
+            getPaintBrush().fillText("Safari Balls", this.playerBattleBoxX+80, 410);
+            getPaintBrush().fillText("Left: " + player.getNumSafariBalls(), this.playerBattleBoxX+120, 460);
+            getPaintBrush().drawImage(battleBoxImage, 0, 175, 18, 18, this.playerBattleBoxX+280, 410, 36, 36);
 
-            getPaintBrush().drawImage(battleBoxImage, 0, 40, 100, 28, pokemonBattleBoxX, 60, 100<<2, 28<<2);
-            getPaintBrush().fillText(wildPokemon.getName(), pokemonBattleBoxX+20, 105);
-            getPaintBrush().fillText("Lv" + wildPokemon.getLevel(), pokemonBattleBoxX+280, 105);
+            getPaintBrush().drawImage(battleBoxImage, 0, 40, 100, 28, this.pokemonBattleBoxX, 60, 400, 112);
+            getPaintBrush().fillText(wildPokemon.getName(), this.pokemonBattleBoxX+20, 105);
+            getPaintBrush().drawImage(battleBoxImage, genderSourceX, genderSourceY, 32, 32, genderX, 78, 32, 32);
+            getPaintBrush().fillText("Lv" + wildPokemon.getLevel(), this.pokemonBattleBoxX+280, 105);
 
-            if (playerBattleBoxX > PLAYER_BATTLE_BOX_FINAL_X)
-                playerBattleBoxX -= ANIMATION_SPEED;
-            if (pokemonBattleBoxX < POKEMON_BATTLE_BOX_FINAL_X)
-                pokemonBattleBoxX += ANIMATION_SPEED;
+            if (this.playerBattleBoxX > PLAYER_BATTLE_BOX_FINAL_X)
+                this.playerBattleBoxX -= ANIMATION_SPEED;
+            if (this.pokemonBattleBoxX < POKEMON_BATTLE_BOX_FINAL_X)
+            {
+                this.pokemonBattleBoxX += ANIMATION_SPEED;
+                this.genderX += ANIMATION_SPEED;
+            }
 
-            if (playerBattleBoxX == PLAYER_BATTLE_BOX_FINAL_X && pokemonBattleBoxX == POKEMON_BATTLE_BOX_FINAL_X)
+            if (this.playerBattleBoxX == PLAYER_BATTLE_BOX_FINAL_X && this.pokemonBattleBoxX == POKEMON_BATTLE_BOX_FINAL_X)
             {
                 this.stop();
                 battlePhase();
@@ -297,40 +318,57 @@ public final class BattleScene extends GameScene
     }
 
 
+
+
+
     /**
      *
      */
+    private static double startNanoTime;
+
     private void battlePhase ()
     {
         final AnimationTimer battlePhase = new BattlePhaseAnimationTimer();
         this.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
-            public void handle(KeyEvent event)
+            public void handle(final KeyEvent event)
             {
                 switch (event.getCode())
                 {
                     case W:
-                        menuRow = 0;
-                        actionArrowY = 566;
+                        if (menuRow != 0) {
+                            menuRow = 0;
+                            actionArrowY = ARROW_TOP;
+                        }
                         break;
                     case A:
-                        menuCol = 0;
-                        actionArrowX = 475;
+                        if (menuCol != 0) {
+                            menuCol = 0;
+                            actionArrowX = ARROW_LEFT;
+                            currArrowX = ARROW_LEFT;
+                        }
                         break;
                     case S:
-                        menuRow = 1;
-                        actionArrowY = 636;
+                        if (menuRow != 1) {
+                            menuRow = 1;
+                            actionArrowY = ARROW_BOTTOM;
+                        }
                         break;
                     case D:
-                        menuCol = 1;
-                        actionArrowX = 665;
+                        if (menuCol != 1) {
+                            menuCol = 1;
+                            actionArrowX = ARROW_RIGHT;
+                            currArrowX = ARROW_RIGHT;
+                        }
                         break;
                     case SPACE:
+                        battlePhase.stop();
+                        startNanoTime = System.nanoTime();
                         if (menuRow == 0)
-                            if (menuCol == 0) System.out.println("Throw Ball!");
-                            else System.out.println("Throw Bait!");
+                            if (menuCol == 0) new ThrowSafariBallAnimationTimer().start();
+                            else new ThrowBaitAnimationTimer().start();
                         else
-                            if (menuCol == 0) System.out.println("Throw Rock!");
+                            if (menuCol == 0) new ThrowRockAnimationTimer().start();
                             else System.out.println("Run!");
                         break;
                 }
@@ -343,15 +381,13 @@ public final class BattleScene extends GameScene
     /**
      *
      */
-
-
-
     private final class BattlePhaseAnimationTimer extends AnimationTimer
     {
-
+        private static final double ARROW_SPEED = 0.2;
+        private boolean arrowGoingLeft = false;
 
         @Override
-        public void handle (long now)
+        public void handle (final long now)
         {
             getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
             getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
@@ -359,17 +395,18 @@ public final class BattleScene extends GameScene
 
             getPaintBrush().setFont(SMALL_FONT);
             getPaintBrush().setFill(Color.BLACK);
-            getPaintBrush().drawImage(battleBoxImage, 0, 0, 103, 36, 440, 360, 103<<2, 36<<2);
+            getPaintBrush().drawImage(battleBoxImage, 0, 0, 103, 36, 440, 360, 412, 144);
             getPaintBrush().fillText("Safari Balls", 520, 410);
             getPaintBrush().fillText("Left: " + player.getNumSafariBalls(), 560, 460);
-            getPaintBrush().drawImage(battleBoxImage, 0, 175, 18, 18, 720, 410, 18<<1, 18<<1);
+            getPaintBrush().drawImage(battleBoxImage, 0, 175, 18, 18, 720, 410, 36, 36);
 
-            getPaintBrush().drawImage(battleBoxImage, 0, 40, 100, 28, 40, 60, 100<<2, 28<<2);
+            getPaintBrush().drawImage(battleBoxImage, 0, 40, 100, 28, 40, 60, 400, 112);
             getPaintBrush().fillText(wildPokemon.getName(), 60, 105);
+            getPaintBrush().drawImage(battleBoxImage, genderSourceX, genderSourceY, 32, 32, genderDestX, 78, 32, 32);
             getPaintBrush().fillText("Lv" + wildPokemon.getLevel(), 320, 105);
 
             getPaintBrush().setFont(BIG_FONT);
-            getPaintBrush().drawImage(battleBoxImage, 0, 200, 176, 78, 440, 523, 176*2.5, 78*2.5);
+            getPaintBrush().drawImage(battleBoxImage, 0, 200, 176, 78, 440, 523, 440, 195);
             getPaintBrush().fillText("Ball", 520, 595);
             getPaintBrush().fillText("Rock", 520, 665);
             getPaintBrush().fillText("Bait", 710, 595);
@@ -380,23 +417,105 @@ public final class BattleScene extends GameScene
             getPaintBrush().fillText(player.getName()+" throw?", 40, 650);
 
             getPaintBrush().drawImage(battleBoxImage, 50, 120, 32, 32, actionArrowX, actionArrowY, 32, 32);
+
+            if (actionArrowX > currArrowX+5)
+                arrowGoingLeft = true;
+            else if (actionArrowX < currArrowX)
+                arrowGoingLeft = false;
+            if (arrowGoingLeft)
+                actionArrowX -= ARROW_SPEED;
+            else
+                actionArrowX += ARROW_SPEED;
         }
 
     }
 
-        /*this.getPaintBrush().drawImage(this.battleBoxImage,
-                this.wildPokemonGenderX, this.wildPokemonGenderY,
-                32, 32,
-                (this.wildPokemon.getName().length()*21)+60, 76,
-                32, 32);
-         */
 
 
-        /*this.getPaintBrush().drawImage(this.battleBoxImage,
-                110, 0,
-                32, 32,
-                470, 566,
-                32, 32);
-         */
+
+
+
+    private final class ThrowSafariBallAnimationTimer extends AnimationTimer
+    {
+        @Override
+        public void handle (final long now)
+        {
+            int currTime = (int)((now-startNanoTime)/100_000_000);
+            getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
+
+            if (currTime == 2)
+                getPaintBrush().drawImage(playerImage, 70, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+            else if (currTime == 3)
+                getPaintBrush().drawImage(playerImage, 140, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+            else if (currTime == 4)
+                getPaintBrush().drawImage(playerImage, 210, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X+40, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+            else
+                getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+
+            getPaintBrush().drawImage(pokemonImage, wildPokemonSourceX, wildPokemonSourceY, SRC_WILD_POKEMON_IMAGE_SIZE, SRC_WILD_POKEMON_IMAGE_SIZE, WILD_POKEMON_X, WILD_POKEMON_Y, DEST_WILD_POKEMON_IMAGE_SIZE, DEST_WILD_POKEMON_IMAGE_SIZE);
+        }
+
+    }
+
+
+
+
+
+
+
+
+    private final class ThrowBaitAnimationTimer extends AnimationTimer
+    {
+        @Override
+        public void handle (final long now)
+        {
+            int currTime = (int)((now-startNanoTime)/100_000_000);
+            getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
+
+            if (currTime == 2)
+                getPaintBrush().drawImage(playerImage, 70, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+            else if (currTime == 3)
+                getPaintBrush().drawImage(playerImage, 140, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+            else if (currTime == 4)
+                getPaintBrush().drawImage(playerImage, 210, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X+40, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+            else
+                getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+
+            getPaintBrush().drawImage(pokemonImage, wildPokemonSourceX, wildPokemonSourceY, SRC_WILD_POKEMON_IMAGE_SIZE, SRC_WILD_POKEMON_IMAGE_SIZE, WILD_POKEMON_X, WILD_POKEMON_Y, DEST_WILD_POKEMON_IMAGE_SIZE, DEST_WILD_POKEMON_IMAGE_SIZE);
+        }
+
+    }
+
+
+
+
+
+
+    private final class ThrowRockAnimationTimer extends AnimationTimer
+    {
+        @Override
+        public void handle (final long now)
+        {
+            int currTime = (int)((now-startNanoTime)/100_000_000);
+            getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
+
+            if (currTime == 2)
+                getPaintBrush().drawImage(playerImage, 70, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+            else if (currTime == 3)
+                getPaintBrush().drawImage(playerImage, 140, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+            else if (currTime == 4)
+                getPaintBrush().drawImage(playerImage, 210, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X+40, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+            else
+                getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+
+            getPaintBrush().drawImage(pokemonImage, wildPokemonSourceX, wildPokemonSourceY, SRC_WILD_POKEMON_IMAGE_SIZE, SRC_WILD_POKEMON_IMAGE_SIZE, WILD_POKEMON_X, WILD_POKEMON_Y, DEST_WILD_POKEMON_IMAGE_SIZE, DEST_WILD_POKEMON_IMAGE_SIZE);
+        }
+
+    }
+
+
+
+
+
 
 } // final class BattleScene
