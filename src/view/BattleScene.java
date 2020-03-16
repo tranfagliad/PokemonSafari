@@ -1,6 +1,8 @@
 package view;
 
 import controller.audio.CryPlayer;
+import controller.audio.SfxLibrary;
+import controller.audio.SfxPlayer;
 import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
 import javafx.scene.effect.ColorAdjust;
@@ -64,6 +66,8 @@ public final class BattleScene extends GameScene
     private static final double ARROW_RIGHT = 665.0;
     private static double currArrowX = ARROW_LEFT;
 
+    private static double startNanoTime;
+
     private Image backgroundImage;
     private Image battleBoxImage;
     private Image pokemonImage;
@@ -72,6 +76,8 @@ public final class BattleScene extends GameScene
 
     private Player player;
     private Pokemon wildPokemon;
+
+
 
 
     /**
@@ -125,7 +131,7 @@ public final class BattleScene extends GameScene
     private void transition ()
     {
         this.getPaintBrush().setFill(Color.BLACK);
-        final AnimationTimer transition = new TransitionAnimationTimer();
+        final AnimationTimer transition = new TransitionAnimation();
         transition.start();
     } // transition()
 
@@ -135,7 +141,7 @@ public final class BattleScene extends GameScene
      *
      * Purpose: Defines and handles the transition animation that plays when a battle starts.
      */
-    private final class TransitionAnimationTimer extends AnimationTimer
+    private final class TransitionAnimation extends AnimationTimer
     {
         private static final double MIN_ANGLE = -360.0;
         private static final double MAX_ANGLE =  360.0;
@@ -191,7 +197,7 @@ public final class BattleScene extends GameScene
             getPaintBrush().fillArc(-180,-180,getWidth()+360,getHeight()+360,90, arcExtent, ArcType.ROUND);
         } // handle()
 
-    } // final class TransitionAnimationTimer
+    } // final class TransitionAnimation
 
 
     /**
@@ -199,7 +205,7 @@ public final class BattleScene extends GameScene
      */
     private void standby ()
     {
-        final AnimationTimer standby = new StandbyAnimationTimer();
+        final AnimationTimer standby = new StandbyAnimation();
         this.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(final KeyEvent event)
@@ -208,6 +214,7 @@ public final class BattleScene extends GameScene
                 {
                     standby.stop();
                     getPaintBrush().setFill(Color.BLACK);
+                    SfxPlayer.getInstance().play(SfxLibrary.Select.name());
                     enterBattlePhase();
                 }
             }
@@ -219,7 +226,7 @@ public final class BattleScene extends GameScene
     /**
      *
      */
-    private final class StandbyAnimationTimer extends AnimationTimer
+    private final class StandbyAnimation extends AnimationTimer
     {
         private static final double MIN_ARROW_HEIGHT = 650.0;
         private static final double MAX_ARROW_HEIGHT = 655.0;
@@ -259,11 +266,8 @@ public final class BattleScene extends GameScene
     private void enterBattlePhase ()
     {
         getPaintBrush().setFont(SMALL_FONT);
-        final AnimationTimer enterBattlePhase = new EnterBattlePhaseAnimationTimer();
-        this.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(final KeyEvent event) { /* Do nothing */ }
-        });
+        final AnimationTimer enterBattlePhase = new EnterBattlePhaseAnimation();
+        this.getScene().setOnKeyPressed(null);
         enterBattlePhase.start();
     }
 
@@ -271,7 +275,7 @@ public final class BattleScene extends GameScene
     /**
      *
      */
-    private final class EnterBattlePhaseAnimationTimer extends AnimationTimer
+    private final class EnterBattlePhaseAnimation extends AnimationTimer
     {
         private static final double PLAYER_BATTLE_BOX_FINAL_X = 440;
         private static final double POKEMON_BATTLE_BOX_FINAL_X = 40;
@@ -324,11 +328,9 @@ public final class BattleScene extends GameScene
     /**
      *
      */
-    private static double startNanoTime;
-
     private void battlePhase ()
     {
-        final AnimationTimer battlePhase = new BattlePhaseAnimationTimer();
+        final AnimationTimer battlePhase = new BattlePhaseAnimation();
         this.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(final KeyEvent event)
@@ -339,6 +341,7 @@ public final class BattleScene extends GameScene
                         if (menuRow != 0) {
                             menuRow = 0;
                             actionArrowY = ARROW_TOP;
+                            SfxPlayer.getInstance().play(SfxLibrary.Select.name());
                         }
                         break;
                     case A:
@@ -346,12 +349,14 @@ public final class BattleScene extends GameScene
                             menuCol = 0;
                             actionArrowX = ARROW_LEFT;
                             currArrowX = ARROW_LEFT;
+                            SfxPlayer.getInstance().play(SfxLibrary.Select.name());
                         }
                         break;
                     case S:
                         if (menuRow != 1) {
                             menuRow = 1;
                             actionArrowY = ARROW_BOTTOM;
+                            SfxPlayer.getInstance().play(SfxLibrary.Select.name());
                         }
                         break;
                     case D:
@@ -359,17 +364,22 @@ public final class BattleScene extends GameScene
                             menuCol = 1;
                             actionArrowX = ARROW_RIGHT;
                             currArrowX = ARROW_RIGHT;
+                            SfxPlayer.getInstance().play(SfxLibrary.Select.name());
                         }
                         break;
                     case SPACE:
                         battlePhase.stop();
+                        getScene().setOnKeyPressed(null);
                         startNanoTime = System.nanoTime();
                         if (menuRow == 0)
-                            if (menuCol == 0) new ThrowSafariBallAnimationTimer().start();
-                            else new ThrowBaitAnimationTimer().start();
+                            if (menuCol == 0) new ThrowSafariBallAnimation().start();
+                            else new ThrowBaitAnimation().start();
                         else
-                            if (menuCol == 0) new ThrowRockAnimationTimer().start();
-                            else System.out.println("Run!");
+                            if (menuCol == 0) new ThrowRockAnimation().start();
+                            else {
+                                battlePhase.stop();
+                                run();
+                            }
                         break;
                 }
             }
@@ -381,7 +391,7 @@ public final class BattleScene extends GameScene
     /**
      *
      */
-    private final class BattlePhaseAnimationTimer extends AnimationTimer
+    private final class BattlePhaseAnimation extends AnimationTimer
     {
         private static final double ARROW_SPEED = 0.2;
         private boolean arrowGoingLeft = false;
@@ -434,17 +444,26 @@ public final class BattleScene extends GameScene
     /**
      *
      */
-    private final class ThrowSafariBallAnimationTimer extends AnimationTimer
+    private class ThrowAnimation extends AnimationTimer
     {
         private static final double ITEM_START_X = 450;
         private static final double ITEM_START_Y = 350;
-        private static final double START_ANGLE = 135.2;
+        private static final double START_ANGLE = 135.3;
         private static final double FINAL_ANGLE = 137.65;
         private static final double ITEM_SPEED = 0.05;
 
         private double itemX = ITEM_START_X;
         private double itemY = ITEM_START_Y;
         private double angle = START_ANGLE;
+        private int rotate = 0;
+
+        private double itemSrcY;
+
+
+        private ThrowAnimation (final double itemSrcY)
+        {
+            this.itemSrcY = itemSrcY;
+        }
 
 
         /**
@@ -455,20 +474,18 @@ public final class BattleScene extends GameScene
         {
             int currTime = (int)((now-startNanoTime)/100_000_000);
             getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
-
             getPaintBrush().drawImage(pokemonImage, wildPokemonSourceX, wildPokemonSourceY, SRC_WILD_POKEMON_IMAGE_SIZE, SRC_WILD_POKEMON_IMAGE_SIZE, WILD_POKEMON_X, WILD_POKEMON_Y, DEST_WILD_POKEMON_IMAGE_SIZE, DEST_WILD_POKEMON_IMAGE_SIZE);
-
             if (currTime > 4) {
                 if (this.angle < FINAL_ANGLE) {
                     itemX = (200 * Math.cos(this.angle)) + ITEM_START_X;
                     itemY = (200 * Math.sin(this.angle)) + ITEM_START_Y;
                     this.angle += ITEM_SPEED;
-                    System.out.println(angle);
-                    getPaintBrush().drawImage(battleItemImage, 0, 20, 16, 16, itemX, itemY, 40, 40);
+                    this.rotate = (this.rotate + 1) % 8;
+                    getPaintBrush().drawImage(battleItemImage, this.rotate*16, itemSrcY, 16, 16, itemX, itemY, 40, 40);
                     getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
                 }
                 else {
-                    getPaintBrush().drawImage(battleItemImage, 0, 20, 16, 16, itemX, itemY, 40, 40);
+                    getPaintBrush().drawImage(battleItemImage, 0, itemSrcY, 16, 16, itemX, itemY, 40, 40);
                     getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
                     this.stop();
                 }
@@ -477,41 +494,149 @@ public final class BattleScene extends GameScene
                 getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
             }
             else if (currTime == 2) {
-                getPaintBrush().drawImage(battleItemImage, 0, 20, 16, 16, 115, 415, 40, 40);
+                getPaintBrush().drawImage(battleItemImage, 0, itemSrcY, 16, 16, 115, 415, 40, 40);
                 getPaintBrush().drawImage(playerImage, 70, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
             }
             else if (currTime == 3) {
-                getPaintBrush().drawImage(battleItemImage, 0, 20, 16, 16, 115, 355, 40, 40);
+                getPaintBrush().drawImage(battleItemImage, 0, itemSrcY, 16, 16, 115, 355, 40, 40);
                 getPaintBrush().drawImage(playerImage, 140, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
             }
             else { /* currTime == 4 */
                 itemX = (200 * Math.cos(this.angle)) + ITEM_START_X;
                 itemY = (200 * Math.sin(this.angle)) + ITEM_START_Y;
                 this.angle += ITEM_SPEED;
-                getPaintBrush().drawImage(battleItemImage, 0, 20, 16, 16, itemX, itemY, 40, 40);
+                this.rotate = (this.rotate + 1) % 8;
+                getPaintBrush().drawImage(battleItemImage, this.rotate*16, itemSrcY, 16, 16, itemX, itemY, 40, 40);
                 getPaintBrush().drawImage(playerImage, 210, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X + 40, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
             }
-        }
-
+        } // handle()
     }
 
 
-    private final class ThrowBaitAnimationTimer extends AnimationTimer
+    /**
+     *
+     */
+    private final class ThrowSafariBallAnimation extends ThrowAnimation
     {
+        private ThrowSafariBallAnimation ()
+        {
+            super(20);
+        }
+
         @Override
         public void handle (final long now)
         {
-
+            super.handle(now);
         }
+
+    } // final class ThrowSafariBallAnimation
+
+
+    /**
+     *
+     */
+    private final class ThrowBaitAnimation extends ThrowAnimation
+    {
+        private ThrowBaitAnimation ()
+        {
+            super(0);
+        }
+
+        @Override
+        public void handle (final long now)
+        {
+            super.handle(now);
+        }
+
+    } // final class ThrowBaitAnimation
+
+
+    /**
+     *
+     */
+    private final class ThrowRockAnimation extends ThrowAnimation
+    {
+        private ThrowRockAnimation ()
+        {
+            super(40);
+        }
+
+        @Override
+        public void handle (final long now)
+        {
+            super.handle(now);
+        }
+
+    } // final class ThrowRockAnimation
+
+
+    /**
+     *
+     */
+    private void run ()
+    {
+        SfxPlayer.getInstance().play(SfxLibrary.Run.name());
+        AnimationTimer runAnimation = new RunAnimation();
+        this.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(final KeyEvent event)
+            {
+                if (event.getCode() == KeyCode.SPACE) {
+                    SfxPlayer.getInstance().play(SfxLibrary.Select.name());
+                    getScene().setOnKeyPressed(null);
+                    runAnimation.stop();
+                }
+            }
+        });
+        runAnimation.start();
     }
 
 
-    private final class ThrowRockAnimationTimer extends AnimationTimer
+    /**
+     *
+     */
+    private final class RunAnimation extends AnimationTimer
     {
+        private static final double MIN_ARROW_HEIGHT = 650.0;
+        private static final double MAX_ARROW_HEIGHT = 655.0;
+        private static final double ARROW_SPEED = 0.2;
+
+        private double arrowHeight = MIN_ARROW_HEIGHT;
+        private boolean arrowGoingUp = false;
+
+
         @Override
         public void handle (final long now)
         {
+            getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
+            getPaintBrush().drawImage(pokemonImage, wildPokemonSourceX, wildPokemonSourceY, SRC_WILD_POKEMON_IMAGE_SIZE, SRC_WILD_POKEMON_IMAGE_SIZE, WILD_POKEMON_X, WILD_POKEMON_Y, DEST_WILD_POKEMON_IMAGE_SIZE, DEST_WILD_POKEMON_IMAGE_SIZE);
+            getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
 
+            getPaintBrush().setFont(SMALL_FONT);
+            getPaintBrush().setFill(Color.BLACK);
+            getPaintBrush().drawImage(battleBoxImage, 0, 0, 103, 36, 440, 360, 412, 144);
+            getPaintBrush().fillText("Safari Balls", 520, 410);
+            getPaintBrush().fillText("Left: " + player.getNumSafariBalls(), 560, 460);
+            getPaintBrush().drawImage(battleBoxImage, 0, 175, 18, 18, 720, 410, 36, 36);
+
+            getPaintBrush().drawImage(battleBoxImage, 0, 40, 100, 28, 40, 60, 400, 112);
+            getPaintBrush().fillText(wildPokemon.getName(), 60, 105);
+            getPaintBrush().drawImage(battleBoxImage, genderSourceX, genderSourceY, 32, 32, genderDestX, 78, 32, 32);
+            getPaintBrush().fillText("Lv" + wildPokemon.getLevel(), 320, 105);
+
+            getPaintBrush().setFont(BIG_FONT);
+            getPaintBrush().setFill(Color.WHITE);
+            getPaintBrush().fillText("Got away safely!", 40, 600);
+
+            getPaintBrush().drawImage(battleBoxImage, 120, 0, 32, 32, 800, this.arrowHeight, 32, 32);
+            if (this.arrowHeight > MAX_ARROW_HEIGHT)
+                this.arrowGoingUp = true;
+            else if (this.arrowHeight < MIN_ARROW_HEIGHT)
+                this.arrowGoingUp = false;
+            if (this.arrowGoingUp)
+                this.arrowHeight -= ARROW_SPEED;
+            else
+                this.arrowHeight += ARROW_SPEED;
         }
     }
 

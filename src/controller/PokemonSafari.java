@@ -1,6 +1,7 @@
 package controller;
 
 import controller.audio.CryPlayer;
+import controller.audio.SfxPlayer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -54,7 +55,7 @@ public final class PokemonSafari extends Application
     {
         initWindow(window);
         initMediaPlayers();
-        PokemonSafari.goToNextScene(new BattleScene(new Player("Daniel"), PokemonFactory.getPokemon(Rarity.Common)));
+        PokemonSafari.goToNextScene(new BattleScene(new Player("Daniel"), PokemonFactory.getPokemon(Rarity.Uncommon)));
         window.show();
     } // start()
 
@@ -87,7 +88,7 @@ public final class PokemonSafari extends Application
     {
         CryPlayer.getInstance();
         //MusicPlayer.getInstance();
-        //SfxPlayer.getInstance();
+        SfxPlayer.getInstance();
     } // initMediaPlayers()
 
 
