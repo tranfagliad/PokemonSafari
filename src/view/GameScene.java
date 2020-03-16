@@ -10,7 +10,7 @@ import javafx.scene.canvas.GraphicsContext;
  */
 public abstract class GameScene extends Canvas
 {
-    private GraphicsContext paintBrush;
+    protected GraphicsContext paintBrush;
 
 
     /**

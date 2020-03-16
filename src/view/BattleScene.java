@@ -431,37 +431,69 @@ public final class BattleScene extends GameScene
     }
 
 
-
-
-
-
+    /**
+     *
+     */
     private final class ThrowSafariBallAnimationTimer extends AnimationTimer
     {
+        private static final double ITEM_START_X = 450;
+        private static final double ITEM_START_Y = 350;
+        private static final double START_ANGLE = 135.2;
+        private static final double FINAL_ANGLE = 137.65;
+        private static final double ITEM_SPEED = 0.05;
+
+        private double itemX = ITEM_START_X;
+        private double itemY = ITEM_START_Y;
+        private double angle = START_ANGLE;
+
+
+        /**
+         *
+         */
         @Override
         public void handle (final long now)
         {
             int currTime = (int)((now-startNanoTime)/100_000_000);
             getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
 
-            if (currTime == 2)
-                getPaintBrush().drawImage(playerImage, 70, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
-            else if (currTime == 3)
-                getPaintBrush().drawImage(playerImage, 140, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
-            else if (currTime == 4)
-                getPaintBrush().drawImage(playerImage, 210, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X+40, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
-            else
-                getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
-
             getPaintBrush().drawImage(pokemonImage, wildPokemonSourceX, wildPokemonSourceY, SRC_WILD_POKEMON_IMAGE_SIZE, SRC_WILD_POKEMON_IMAGE_SIZE, WILD_POKEMON_X, WILD_POKEMON_Y, DEST_WILD_POKEMON_IMAGE_SIZE, DEST_WILD_POKEMON_IMAGE_SIZE);
+
+            if (currTime > 4) {
+                if (this.angle < FINAL_ANGLE) {
+                    itemX = (200 * Math.cos(this.angle)) + ITEM_START_X;
+                    itemY = (200 * Math.sin(this.angle)) + ITEM_START_Y;
+                    this.angle += ITEM_SPEED;
+                    System.out.println(angle);
+                    getPaintBrush().drawImage(battleItemImage, 0, 20, 16, 16, itemX, itemY, 40, 40);
+                    getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+                }
+                else {
+                    getPaintBrush().drawImage(battleItemImage, 0, 20, 16, 16, itemX, itemY, 40, 40);
+                    getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+                    this.stop();
+                }
+            }
+            else if (currTime < 2) {
+                getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+            }
+            else if (currTime == 2) {
+                getPaintBrush().drawImage(battleItemImage, 0, 20, 16, 16, 115, 415, 40, 40);
+                getPaintBrush().drawImage(playerImage, 70, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+            }
+            else if (currTime == 3) {
+                getPaintBrush().drawImage(battleItemImage, 0, 20, 16, 16, 115, 355, 40, 40);
+                getPaintBrush().drawImage(playerImage, 140, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+            }
+            else { /* currTime == 4 */
+                itemX = (200 * Math.cos(this.angle)) + ITEM_START_X;
+                itemY = (200 * Math.sin(this.angle)) + ITEM_START_Y;
+                this.angle += ITEM_SPEED;
+                getPaintBrush().drawImage(battleItemImage, 0, 20, 16, 16, itemX, itemY, 40, 40);
+                getPaintBrush().drawImage(playerImage, 210, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X + 40, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+            }
         }
 
     }
-
-
-
-
-
-
 
 
     private final class ThrowBaitAnimationTimer extends AnimationTimer
@@ -469,26 +501,9 @@ public final class BattleScene extends GameScene
         @Override
         public void handle (final long now)
         {
-            int currTime = (int)((now-startNanoTime)/100_000_000);
-            getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
 
-            if (currTime == 2)
-                getPaintBrush().drawImage(playerImage, 70, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
-            else if (currTime == 3)
-                getPaintBrush().drawImage(playerImage, 140, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
-            else if (currTime == 4)
-                getPaintBrush().drawImage(playerImage, 210, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X+40, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
-            else
-                getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
-
-            getPaintBrush().drawImage(pokemonImage, wildPokemonSourceX, wildPokemonSourceY, SRC_WILD_POKEMON_IMAGE_SIZE, SRC_WILD_POKEMON_IMAGE_SIZE, WILD_POKEMON_X, WILD_POKEMON_Y, DEST_WILD_POKEMON_IMAGE_SIZE, DEST_WILD_POKEMON_IMAGE_SIZE);
         }
-
     }
-
-
-
-
 
 
     private final class ThrowRockAnimationTimer extends AnimationTimer
@@ -496,26 +511,8 @@ public final class BattleScene extends GameScene
         @Override
         public void handle (final long now)
         {
-            int currTime = (int)((now-startNanoTime)/100_000_000);
-            getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
 
-            if (currTime == 2)
-                getPaintBrush().drawImage(playerImage, 70, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
-            else if (currTime == 3)
-                getPaintBrush().drawImage(playerImage, 140, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
-            else if (currTime == 4)
-                getPaintBrush().drawImage(playerImage, 210, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X+40, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
-            else
-                getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
-
-            getPaintBrush().drawImage(pokemonImage, wildPokemonSourceX, wildPokemonSourceY, SRC_WILD_POKEMON_IMAGE_SIZE, SRC_WILD_POKEMON_IMAGE_SIZE, WILD_POKEMON_X, WILD_POKEMON_Y, DEST_WILD_POKEMON_IMAGE_SIZE, DEST_WILD_POKEMON_IMAGE_SIZE);
         }
-
     }
-
-
-
-
-
 
 } // final class BattleScene
