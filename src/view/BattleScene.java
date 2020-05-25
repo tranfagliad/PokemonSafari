@@ -1030,7 +1030,7 @@ public final class BattleScene extends GameScene
             getPaintBrush().setFill(Color.WHITE);
             getPaintBrush().fillText(wildPokemon.getName()+" ate the bait", 40, 600);
 
-            if (this.frames == 80) {
+            if (this.frames == 100) {
                 wildPokemon.setRunLikelihood(wildPokemon.getRunLikelihood() - RUN_LIKELIHOOD_CHANGE);
                 this.stop();
                 battlePhase();
@@ -1047,23 +1047,53 @@ public final class BattleScene extends GameScene
         private ThrowRockAnimation ()
         {
             super(40);
-            if (this.throwComplete)
-                System.out.println("Throw complete");
         }
 
         @Override
         public void handle (final long now)
         {
             super.handle(now);
+            if (this.throwComplete)
+                new PokemonHitByRockAnimation().start();
         }
 
     } // final class ThrowRockAnimation
 
 
 
+    private final class PokemonHitByRockAnimation extends AnimationTimer
+    {
+        private int frames = 0;
 
 
+        @Override
+        public void handle (long now)
+        {
+            this.frames++;
 
+            getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
+            getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+            getPaintBrush().drawImage(pokemonImage, wildPokemonSourceX, wildPokemonSourceY, SRC_WILD_POKEMON_IMAGE_SIZE, SRC_WILD_POKEMON_IMAGE_SIZE, WILD_POKEMON_X, WILD_POKEMON_Y, DEST_WILD_POKEMON_IMAGE_SIZE, DEST_WILD_POKEMON_IMAGE_SIZE);
+
+            if (this.frames >= 10 && this.frames < 30)
+                getPaintBrush().drawImage(battleBoxImage, 200, 0, 32, 32, 550, 150, 32*2, 32*2);
+            else if (this.frames >= 30 && this.frames < 50)
+                getPaintBrush().drawImage(battleBoxImage, 200, 0, 32, 32, 700, 150, 32*2, 32*2);
+            else if (this.frames >= 50 && this.frames < 150)
+            {
+                getPaintBrush().setFont(BIG_FONT);
+                getPaintBrush().setFill(Color.WHITE);
+                getPaintBrush().fillText(wildPokemon.getName()+" is angry", 40, 600);
+            }
+            else if (this.frames == 150)
+            {
+                wildPokemon.setCatchLikelihood(wildPokemon.getCatchLikelihood()+CATCH_LIKELIHOOD_CHANGE);
+                wildPokemon.setRunLikelihood(wildPokemon.getRunLikelihood()+RUN_LIKELIHOOD_CHANGE);
+                this.stop();
+                battlePhase();
+            }
+        }
+    }
 
     
     /**

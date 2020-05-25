@@ -8,7 +8,7 @@ package model.pokemon;
 public final class Pokemon
 {
     private static final int MIN_PERCENT = 20;
-    private static final int ONE_HUNDRED_PERCENT = 100;
+    private static final int MAX_PERCENT = 80;
 
     private int id;
     private String name;
@@ -114,8 +114,8 @@ public final class Pokemon
     public void setCatchLikelihood (int newCatchLikelihood)
     {
         this.catchLikelihood = newCatchLikelihood < MIN_PERCENT ?
-                MIN_PERCENT : newCatchLikelihood > ONE_HUNDRED_PERCENT ?
-                ONE_HUNDRED_PERCENT : newCatchLikelihood;
+                MIN_PERCENT : newCatchLikelihood > MAX_PERCENT ?
+                MAX_PERCENT : newCatchLikelihood;
     } // setCatchLikelihood()
 
 
@@ -139,8 +139,8 @@ public final class Pokemon
     public void setRunLikelihood (int newRunLikelihood)
     {
         this.runLikelihood = newRunLikelihood < MIN_PERCENT ?
-                MIN_PERCENT : newRunLikelihood > ONE_HUNDRED_PERCENT ?
-                ONE_HUNDRED_PERCENT : newRunLikelihood;
+                MIN_PERCENT : newRunLikelihood > MAX_PERCENT ?
+                MAX_PERCENT : newRunLikelihood;
     } // setRunLikelihood()
 
 
