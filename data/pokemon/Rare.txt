@@ -1,1 +1,1 @@
-9, Kangaskhan, 105, 30, 60, 5
+9, Kangaskhan, 105, 30, 60, 10

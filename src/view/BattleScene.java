@@ -39,6 +39,9 @@ public final class BattleScene extends GameScene
     private static final double WILD_POKEMON_X = 490.0;
     private static final double WILD_POKEMON_Y = 20.0;
 
+    private static final int CATCH_LIKELIHOOD_CHANGE = 10;
+    private static final int RUN_LIKELIHOOD_CHANGE = 10;
+
     private static final double SRC_PLAYER_IMAGE_SIZE = 70.0;
     private static final double DEST_PLAYER_IMAGE_SIZE = SRC_PLAYER_IMAGE_SIZE * 3.5;
     private static final double PLAYER_X = 100.0;
@@ -329,6 +332,7 @@ public final class BattleScene extends GameScene
      */
     private void battlePhase ()
     {
+        System.out.println(wildPokemon.toString());
         final AnimationTimer battlePhase = new BattlePhaseAnimation();
         this.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
@@ -965,10 +969,74 @@ public final class BattleScene extends GameScene
         {
             super.handle(now);
             if (this.throwComplete)
-                System.out.println("Throw complete");
+                new PokemonEatBaitAnimationA().start();
         }
 
     } // final class ThrowBaitAnimation
+
+
+
+    private final class PokemonEatBaitAnimationA extends AnimationTimer
+    {
+        private static final double POKEMON_JUMP_Y = 0.0;
+        private static final int MAX_JUMPS = 6;
+        private static final double JUMP_SPEED = 2.5;
+
+        private double pokemonY = WILD_POKEMON_Y;
+        private boolean jumpingUp = false;
+        private int jumps = 0;
+
+        @Override
+        public void handle (long now)
+        {
+
+            getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
+            getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+
+            getPaintBrush().drawImage(pokemonImage, wildPokemonSourceX, wildPokemonSourceY, SRC_WILD_POKEMON_IMAGE_SIZE, SRC_WILD_POKEMON_IMAGE_SIZE, WILD_POKEMON_X, this.pokemonY, DEST_WILD_POKEMON_IMAGE_SIZE, DEST_WILD_POKEMON_IMAGE_SIZE);
+
+            if (this.pokemonY == WILD_POKEMON_Y)
+                this.jumps++;
+            if (this.pokemonY > WILD_POKEMON_Y)
+                this.jumpingUp = true;
+            else if (this.pokemonY < POKEMON_JUMP_Y)
+                this.jumpingUp = false;
+            if (this.jumpingUp)
+                this.pokemonY -= JUMP_SPEED;
+            else
+                this.pokemonY += JUMP_SPEED;
+
+            if (this.jumps == MAX_JUMPS) {
+                this.stop();
+                new PokemonEatBaitAnimationB().start();
+            }
+        }
+    }
+
+
+    private final class PokemonEatBaitAnimationB extends AnimationTimer
+    {
+        private int frames = 0;
+
+        @Override
+        public void handle (long now)
+        {
+            this.frames++;
+            getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
+            getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+            getPaintBrush().drawImage(pokemonImage, wildPokemonSourceX, wildPokemonSourceY, SRC_WILD_POKEMON_IMAGE_SIZE, SRC_WILD_POKEMON_IMAGE_SIZE, WILD_POKEMON_X, WILD_POKEMON_Y, DEST_WILD_POKEMON_IMAGE_SIZE, DEST_WILD_POKEMON_IMAGE_SIZE);
+
+            getPaintBrush().setFont(BIG_FONT);
+            getPaintBrush().setFill(Color.WHITE);
+            getPaintBrush().fillText(wildPokemon.getName()+" ate the bait", 40, 600);
+
+            if (this.frames == 80) {
+                wildPokemon.setRunLikelihood(wildPokemon.getRunLikelihood() - RUN_LIKELIHOOD_CHANGE);
+                this.stop();
+                battlePhase();
+            }
+        }
+    }
 
 
     /**
@@ -992,6 +1060,12 @@ public final class BattleScene extends GameScene
     } // final class ThrowRockAnimation
 
 
+
+
+
+
+
+    
     /**
      *
      */
