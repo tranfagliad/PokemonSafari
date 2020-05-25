@@ -42,6 +42,8 @@ public final class BattleScene extends GameScene
     private static final int CATCH_LIKELIHOOD_CHANGE = 10;
     private static final int RUN_LIKELIHOOD_CHANGE = 10;
 
+    private static final int ONE_HUNDRED_PERCENT = 100;
+
     private static final double SRC_PLAYER_IMAGE_SIZE = 70.0;
     private static final double DEST_PLAYER_IMAGE_SIZE = SRC_PLAYER_IMAGE_SIZE * 3.5;
     private static final double PLAYER_X = 100.0;
@@ -82,7 +84,7 @@ public final class BattleScene extends GameScene
 
     private Player player;
     private Pokemon wildPokemon;
-
+    private int remainingTurns;
 
 
 
@@ -97,6 +99,7 @@ public final class BattleScene extends GameScene
 
         this.player = player;
         this.wildPokemon = wildPokemon;
+        this.remainingTurns = this.wildPokemon.getMaxDuration();
 
         wildPokemonSourceX = (int)((wildPokemon.getID() % 5) * SRC_WILD_POKEMON_IMAGE_SIZE);
         wildPokemonSourceY = (int)((wildPokemon.getID() / 5) * SRC_WILD_POKEMON_IMAGE_SIZE);
@@ -332,7 +335,6 @@ public final class BattleScene extends GameScene
      */
     private void battlePhase ()
     {
-        System.out.println(wildPokemon.toString());
         final AnimationTimer battlePhase = new BattlePhaseAnimation();
         this.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
@@ -400,6 +402,68 @@ public final class BattleScene extends GameScene
         });
         battlePhase.start();
     }
+
+
+
+    private void determineTurnResult ()
+    {
+        this.remainingTurns--;
+        if (this.remainingTurns == 0) {
+            SfxPlayer.getInstance().play(SfxLibrary.Run.name());
+            new PokemonRunAnimation().start();
+            return;
+        }
+        final Random random = new Random();
+        if (random.nextInt(ONE_HUNDRED_PERCENT)+1 < wildPokemon.getRunLikelihood()) {
+            SfxPlayer.getInstance().play(SfxLibrary.Run.name());
+            new PokemonRunAnimation().start();
+        }
+        else
+            battlePhase();
+    }
+
+
+
+
+    private final class PokemonRunAnimation extends AnimationTimer
+    {
+        private final ColorAdjust colorAdjust = new ColorAdjust();
+
+        private int frame = 0;
+        private double pokemonX = WILD_POKEMON_X;
+        private double screenBrightness = DEFAULT_BRIGHTNESS;
+
+        @Override
+        public void handle (final long now)
+        {
+            frame++;
+            getPaintBrush().setEffect(this.colorAdjust);
+
+            getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
+            getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
+
+            if (this.pokemonX < 800.0)
+                this.pokemonX += 10;
+            getPaintBrush().drawImage(pokemonImage, wildPokemonSourceX, wildPokemonSourceY, SRC_WILD_POKEMON_IMAGE_SIZE, SRC_WILD_POKEMON_IMAGE_SIZE, this.pokemonX, WILD_POKEMON_Y, DEST_WILD_POKEMON_IMAGE_SIZE, DEST_WILD_POKEMON_IMAGE_SIZE);
+
+            getPaintBrush().setFont(BIG_FONT);
+            getPaintBrush().setFill(Color.WHITE);
+            getPaintBrush().fillText(wildPokemon.getName()+" ran away!", 40, 600);
+
+            if (this.frame > 100) {
+                this.screenBrightness -= 0.02;
+                this.colorAdjust.setBrightness(this.screenBrightness);
+
+            }
+            if (this.screenBrightness < -1.5) {
+                //////////////////////////////////////////////////////////////////////////////////////////////
+                // EXIT BATTLE HERE AFTER RUNNING
+                //////////////////////////////////////////////////////////////////////////////////////////////
+                this.stop();
+            }
+        }
+    }
+
 
 
     /**
@@ -510,6 +574,7 @@ public final class BattleScene extends GameScene
         private double itemY = ITEM_START_Y;
         private double angle = START_ANGLE;
         private int rotate = 0;
+        private int throwSound;
 
         private double itemSrcY;
         protected boolean throwComplete = false;
@@ -518,6 +583,7 @@ public final class BattleScene extends GameScene
         private ThrowAnimation (final double itemSrcY)
         {
             this.itemSrcY = itemSrcY;
+            this.throwSound = 0;
         }
 
 
@@ -554,6 +620,7 @@ public final class BattleScene extends GameScene
                 getPaintBrush().drawImage(playerImage, 70, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
             }
             else if (currTime == 3) {
+                SfxPlayer.getInstance().play(SfxLibrary.Throw.name());
                 getPaintBrush().drawImage(battleItemImage, 0, itemSrcY, 16, 16, 115, 355, 40, 40);
                 getPaintBrush().drawImage(playerImage, 140, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
             }
@@ -603,12 +670,14 @@ public final class BattleScene extends GameScene
         private double pokemonSizeShrink = 0.0;
         private double pokemonXPush = 0.0;
         private double pokemonYPush = 0.0;
+        private int pokeballOpen;
 
 
         private CatchPokemonAnimationA (final double itemX, final double itemY)
         {
             this.itemX = itemX;
             this.itemY = itemY;
+            this.pokeballOpen = 0;
         }
 
 
@@ -637,6 +706,9 @@ public final class BattleScene extends GameScene
                     new CatchPokemonAnimationB(this.itemX, this.itemY).start();
                     return;
                 }
+                this.pokeballOpen++;
+                if (this.pokeballOpen == 1)
+                    SfxPlayer.getInstance().play(SfxLibrary.Pokeball_Open.name());
                 getPaintBrush().drawImage(battleItemImage, 128, 20, 12, 16, this.itemX, this.itemY, 40, 40);
                 this.colorAdjust.setBrightness(this.pokemonBrightness);
                 getPaintBrush().setEffect(this.colorAdjust);
@@ -691,7 +763,6 @@ public final class BattleScene extends GameScene
 
     private final class CatchPokemonAnimationC extends AnimationTimer
     {
-        private static final int ONE_HUNDRED_PERCENT = 100;
         private final ColorAdjust colorAdjust = new ColorAdjust();
 
         private double itemX;
@@ -783,6 +854,7 @@ public final class BattleScene extends GameScene
         private double itemY;
         private double pokemonBrightness = 1.0;
         private String message;
+        private int pokeballOpen;
 
         private PokemonBreakOutAnimation (final double itemX, final double itemY, final String message)
         {
@@ -790,6 +862,7 @@ public final class BattleScene extends GameScene
             this.frame = 0;
             this.itemX = itemX;
             this.itemY = itemY;
+            this.pokeballOpen = 0;
         }
 
         @Override
@@ -798,6 +871,9 @@ public final class BattleScene extends GameScene
             this.frame++;
             if (this.frame < 20)
                 return;
+            this.pokeballOpen++;
+            if (this.pokeballOpen == 1)
+                SfxPlayer.getInstance().play(SfxLibrary.Pokeball_Open.name());
 
             getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
             getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
@@ -818,7 +894,7 @@ public final class BattleScene extends GameScene
 
                 if (this.frame == 160) {
                     this.stop();
-                    battlePhase();
+                    determineTurnResult();
                 }
             }
             this.colorAdjust.setBrightness(this.pokemonBrightness);
@@ -935,7 +1011,7 @@ public final class BattleScene extends GameScene
             }
             else {
                 ////////////////////////////////////////////////////////////////////////////////////////////////
-                // THIS IS WHERE WE EXIT THE BATTLE
+                // EXIT BATTLE HERE AFTER CATCHING
                 ////////////////////////////////////////////////////////////////////////////////////////////////
                 this.stop();
             }
@@ -1033,7 +1109,7 @@ public final class BattleScene extends GameScene
             if (this.frames == 100) {
                 wildPokemon.setRunLikelihood(wildPokemon.getRunLikelihood() - RUN_LIKELIHOOD_CHANGE);
                 this.stop();
-                battlePhase();
+                determineTurnResult();
             }
         }
     }
@@ -1090,12 +1166,12 @@ public final class BattleScene extends GameScene
                 wildPokemon.setCatchLikelihood(wildPokemon.getCatchLikelihood()+CATCH_LIKELIHOOD_CHANGE);
                 wildPokemon.setRunLikelihood(wildPokemon.getRunLikelihood()+RUN_LIKELIHOOD_CHANGE);
                 this.stop();
-                battlePhase();
+                determineTurnResult();
             }
         }
     }
 
-    
+
     /**
      *
      */
@@ -1104,6 +1180,7 @@ public final class BattleScene extends GameScene
         private final ColorAdjust colorAdjust = new ColorAdjust();
 
         private int frame = 0;
+        private double playerX = PLAYER_X;
         private double screenBrightness = DEFAULT_BRIGHTNESS;
 
         @Override
@@ -1113,14 +1190,17 @@ public final class BattleScene extends GameScene
             getPaintBrush().setEffect(this.colorAdjust);
 
             getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
-            getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
             getPaintBrush().drawImage(pokemonImage, wildPokemonSourceX, wildPokemonSourceY, SRC_WILD_POKEMON_IMAGE_SIZE, SRC_WILD_POKEMON_IMAGE_SIZE, WILD_POKEMON_X, WILD_POKEMON_Y, DEST_WILD_POKEMON_IMAGE_SIZE, DEST_WILD_POKEMON_IMAGE_SIZE);
+
+            if (this.playerX > -220.0)
+                this.playerX -= 10;
+            getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, this.playerX, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
 
             getPaintBrush().setFont(BIG_FONT);
             getPaintBrush().setFill(Color.WHITE);
-            getPaintBrush().fillText("Got away safely", 40, 600);
+            getPaintBrush().fillText("Got away safely!", 40, 600);
 
-            if (this.frame > 80) {
+            if (this.frame > 100) {
                 this.screenBrightness -= 0.02;
                 this.colorAdjust.setBrightness(this.screenBrightness);
 
