@@ -13,6 +13,7 @@ import model.pokemon.PokemonFactory;
 import model.pokemon.Rarity;
 import view.BattleScene;
 import view.GameScene;
+import view.OverworldScene;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -55,7 +56,8 @@ public final class PokemonSafari extends Application
     {
         initWindow(window);
         initMediaPlayers();
-        PokemonSafari.goToNextScene(new BattleScene(new Player("Daniel"), PokemonFactory.getPokemon(Rarity.Common)));
+        //PokemonSafari.goToNextScene(new BattleScene(new Player("Daniel"), PokemonFactory.getPokemon(Rarity.Common)));
+        PokemonSafari.goToNextScene(new OverworldScene(new Player("Daniel")));
         window.show();
     } // start()
 

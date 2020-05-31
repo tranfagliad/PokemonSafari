@@ -140,8 +140,7 @@ public final class BattleScene extends GameScene
     private void transition ()
     {
         this.getPaintBrush().setFill(Color.BLACK);
-        final AnimationTimer transition = new TransitionAnimation();
-        transition.start();
+        new TransitionAnimation().start();
     } // transition()
 
 
@@ -442,7 +441,7 @@ public final class BattleScene extends GameScene
             getPaintBrush().drawImage(backgroundImage, 0, 0, getWidth(), getHeight());
             getPaintBrush().drawImage(playerImage, 0, 0, SRC_PLAYER_IMAGE_SIZE, SRC_PLAYER_IMAGE_SIZE, PLAYER_X, PLAYER_Y, DEST_PLAYER_IMAGE_SIZE, DEST_PLAYER_IMAGE_SIZE);
 
-            if (this.pokemonX < 800.0)
+            if (this.pokemonX < 1000.0)
                 this.pokemonX += 10;
             getPaintBrush().drawImage(pokemonImage, wildPokemonSourceX, wildPokemonSourceY, SRC_WILD_POKEMON_IMAGE_SIZE, SRC_WILD_POKEMON_IMAGE_SIZE, this.pokemonX, WILD_POKEMON_Y, DEST_WILD_POKEMON_IMAGE_SIZE, DEST_WILD_POKEMON_IMAGE_SIZE);
 
@@ -574,7 +573,6 @@ public final class BattleScene extends GameScene
         private double itemY = ITEM_START_Y;
         private double angle = START_ANGLE;
         private int rotate = 0;
-        private int throwSound;
 
         private double itemSrcY;
         protected boolean throwComplete = false;
@@ -583,7 +581,6 @@ public final class BattleScene extends GameScene
         private ThrowAnimation (final double itemSrcY)
         {
             this.itemSrcY = itemSrcY;
-            this.throwSound = 0;
         }
 
 
@@ -837,6 +834,7 @@ public final class BattleScene extends GameScene
             this.colorAdjust.setBrightness(DEFAULT_BRIGHTNESS);
             getPaintBrush().setEffect(this.colorAdjust);
             this.stop();
+            player.getPokemonCaught().add(wildPokemon);
             prepareToExitSuccess(this.itemX, this.itemY);
         }
 
