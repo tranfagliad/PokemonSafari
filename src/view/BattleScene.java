@@ -65,10 +65,6 @@ public final class BattleScene extends GameScene
     private static double genderSourceY;
     private static double genderDestX;
 
-    private static double actionArrowX = 475;
-    private static double actionArrowY = 566;
-    private static int menuRow = 0;
-    private static int menuCol = 0;
     private static final double ARROW_TOP = 566.0;
     private static final double ARROW_BOTTOM = 636.0;
     private static final double ARROW_LEFT = 475.0;
@@ -87,6 +83,11 @@ public final class BattleScene extends GameScene
     private Pokemon wildPokemon;
     private int remainingTurns;
 
+    private double actionArrowX;
+    private double actionArrowY;
+    private int menuRow;
+    private int menuCol;
+
 
 
     /**
@@ -101,6 +102,11 @@ public final class BattleScene extends GameScene
         this.player = player;
         this.wildPokemon = wildPokemon;
         this.remainingTurns = this.wildPokemon.getMaxDuration();
+
+        this.actionArrowX = 475.0;
+        this.actionArrowY = 566.0;
+        this.menuRow = 0;
+        this.menuCol = 0;
 
         wildPokemonSourceX = (int)((wildPokemon.getID() % 5) * SRC_WILD_POKEMON_IMAGE_SIZE);
         wildPokemonSourceY = (int)((wildPokemon.getID() / 5) * SRC_WILD_POKEMON_IMAGE_SIZE);

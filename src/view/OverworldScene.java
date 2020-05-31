@@ -121,6 +121,7 @@ public final class OverworldScene extends GameScene
                         {
                             cameraY--;
                             player.getPosition().setY(player.getPosition().getY()-1);
+                            checkForWildEncounter();
                         }
                         break;
                     case A:
@@ -130,6 +131,7 @@ public final class OverworldScene extends GameScene
                         {
                             cameraX--;
                             player.getPosition().setX(player.getPosition().getX()-1);
+                            checkForWildEncounter();
                         }
                         break;
                     case S:
@@ -139,6 +141,7 @@ public final class OverworldScene extends GameScene
                         {
                             cameraY++;
                             player.getPosition().setY(player.getPosition().getY()+1);
+                            checkForWildEncounter();
                         }
                         break;
                     case D:
@@ -148,12 +151,11 @@ public final class OverworldScene extends GameScene
                         {
                             cameraX++;
                             player.getPosition().setX(player.getPosition().getX()+1);
+                            checkForWildEncounter();
                         }
                         break;
                 }
-
                 drawFrame();
-                checkForWildEncounter();
             }
         });
     }
