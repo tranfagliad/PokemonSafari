@@ -1,5 +1,6 @@
 package model.player;
 
+import model.misc.Position2D;
 import model.pokemon.Pokemon;
 
 import java.util.ArrayList;

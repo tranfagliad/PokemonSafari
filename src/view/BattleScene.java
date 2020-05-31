@@ -1,5 +1,6 @@
 package view;
 
+import controller.PokemonSafari;
 import controller.audio.CryPlayer;
 import controller.audio.SfxLibrary;
 import controller.audio.SfxPlayer;
@@ -459,6 +460,7 @@ public final class BattleScene extends GameScene
                 // EXIT BATTLE HERE AFTER RUNNING
                 //////////////////////////////////////////////////////////////////////////////////////////////
                 this.stop();
+                PokemonSafari.goToPreviousScene();
             }
         }
     }
@@ -1012,6 +1014,7 @@ public final class BattleScene extends GameScene
                 // EXIT BATTLE HERE AFTER CATCHING
                 ////////////////////////////////////////////////////////////////////////////////////////////////
                 this.stop();
+                PokemonSafari.goToPreviousScene();
             }
 
             getPaintBrush().setEffect(this.colorAdjustScreen);
@@ -1208,6 +1211,7 @@ public final class BattleScene extends GameScene
                 // EXIT BATTLE HERE AFTER RUNNING
                 //////////////////////////////////////////////////////////////////////////////////////////////
                 this.stop();
+                PokemonSafari.goToPreviousScene();
             }
         }
     }

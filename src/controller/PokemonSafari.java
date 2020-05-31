@@ -128,4 +128,17 @@ public final class PokemonSafari extends Application
         GameSceneManager.getActiveScene().start();
     } // goToNextScene()
 
+
+    /**
+     * goToPreviousScene()
+     *
+     * Purpose: Returns back to the previous scene.
+     */
+    public static void goToPreviousScene ()
+    {
+        GameSceneManager.removeScene();
+        root.getChildren().remove(root.getChildren().size()-1);
+        GameSceneManager.getActiveScene().start();
+    } // goToPreviousScene()
+
 } // final class PokemonSafari

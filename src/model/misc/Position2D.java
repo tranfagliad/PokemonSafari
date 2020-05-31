@@ -1,4 +1,4 @@
-package model.player;
+package model.misc;
 
 /**
  * Position2D.java
