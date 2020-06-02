@@ -26,13 +26,17 @@ public final class OverworldScene extends GameScene
     private static final String PLAYER_IMAGE_FILENAME   = "images/overworld/trainer_sprites.png";
     private static final String TILE_IMAGE_FILENAME = "images/overworld/tile_sprites.png";
 
+    private static final double MOVEMENT_SPEED = 0.05;
+
     private static final int ONE_HUNDRED_PERCENT = 100;
-    private static final int WILD_ENCOUNTER_CHANCE = 25;
+    private static final int WILD_ENCOUNTER_CHANCE = 15;
 
     private static final double TILE_SIZE = 80.0;
 
     private static final int CAMERA_X_RANGE = 11;
     private static final int CAMERA_Y_RANGE = 9;
+    private static final int PLAYER_X_OFFSET = 5;
+    private static final int PLAYER_Y_OFFSET = 4;
 
 
     private Image playerImages;
@@ -41,8 +45,8 @@ public final class OverworldScene extends GameScene
     private Map map;
     private Player player;
 
-    private double cameraX;
-    private double cameraY;
+    private int cameraX;
+    private int cameraY;
 
     private double playerX;
     private double playerY;
@@ -55,12 +59,12 @@ public final class OverworldScene extends GameScene
 
         this.player = player;
         this.player.getPosition().setX(8);
-        this.player.getPosition().setY(6);
+        this.player.getPosition().setY(16);
         this.playerX = 0;
         this.playerY = 2;
 
-        this.cameraX = (double)(this.player.getPosition().getX()-5);
-        this.cameraY = (double)(this.player.getPosition().getY()-4);
+        this.cameraX = this.player.getPosition().getX()-PLAYER_X_OFFSET;
+        this.cameraY = this.player.getPosition().getY()-PLAYER_Y_OFFSET;
 
         try {
             this.playerImages = new Image(new FileInputStream(PLAYER_IMAGE_FILENAME));
@@ -79,8 +83,6 @@ public final class OverworldScene extends GameScene
     @Override
     public void start ()
     {
-        //System.out.println("Camera: (x="+cameraX+", y="+cameraY+")");
-        //System.out.println("Player: (x="+player.getPosition().getX()+", y="+player.getPosition().getY()+")");
         drawFrame();
 
         setupControls();
@@ -102,7 +104,8 @@ public final class OverworldScene extends GameScene
         }
         getPaintBrush().drawImage(playerImages,
                 this.playerX*32, this.playerY*32,
-                32,32, 5*TILE_SIZE, 4*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                32,32, PLAYER_X_OFFSET*TILE_SIZE, PLAYER_Y_OFFSET*TILE_SIZE,
+                TILE_SIZE, TILE_SIZE);
     }
 
 
@@ -118,49 +121,31 @@ public final class OverworldScene extends GameScene
                         playerX = 0;
                         playerY = 0;
                         if (map.getTile(player.getPosition().getY()-1, player.getPosition().getX()).isWalkable())
-                        {
-                            cameraY--;
-                            player.getPosition().setY(player.getPosition().getY()-1);
-                            checkForWildEncounter();
-                        }
+                            new WalkNorthAnimation().start();
                         break;
                     case A:
                         playerX = 0;
                         playerY = 1;
                         if (map.getTile(player.getPosition().getY(), player.getPosition().getX()-1).isWalkable())
-                        {
-                            cameraX--;
-                            player.getPosition().setX(player.getPosition().getX()-1);
-                            checkForWildEncounter();
-                        }
+                            new WalkWestAnimation().start();
                         break;
                     case S:
                         playerX = 0;
                         playerY = 2;
                         if (map.getTile(player.getPosition().getY()+1, player.getPosition().getX()).isWalkable())
-                        {
-                            cameraY++;
-                            player.getPosition().setY(player.getPosition().getY()+1);
-                            checkForWildEncounter();
-                        }
+                            new WalkSouthAnimation().start();
                         break;
                     case D:
                         playerX = 0;
                         playerY = 3;
                         if (map.getTile(player.getPosition().getY(), player.getPosition().getX()+1).isWalkable())
-                        {
-                            cameraX++;
-                            player.getPosition().setX(player.getPosition().getX()+1);
-                            checkForWildEncounter();
-                        }
+                            new WalkEastAnimation().start();
                         break;
                 }
                 drawFrame();
             }
         });
     }
-
-
 
 
 
@@ -174,16 +159,253 @@ public final class OverworldScene extends GameScene
             {
                 this.getScene().setOnKeyPressed(null);
                 final int rarityChance = random.nextInt(ONE_HUNDRED_PERCENT);
-                if (rarityChance < 60)
-                    PokemonSafari.goToNextScene(new BattleScene(this.player, PokemonFactory.getPokemon(Rarity.Common)));
-                else if (rarityChance < 90)
-                    PokemonSafari.goToNextScene(new BattleScene(this.player, PokemonFactory.getPokemon(Rarity.Uncommon)));
+                Rarity selectedRarity;
+                if (rarityChance < 70)
+                    selectedRarity = Rarity.Common;
+                else if (rarityChance < 95)
+                    selectedRarity = Rarity.Uncommon;
                 else
-                    PokemonSafari.goToNextScene(new BattleScene(this.player, PokemonFactory.getPokemon(Rarity.Rare)));
+                    selectedRarity = Rarity.Rare;
+                PokemonSafari.goToNextScene(new BattleScene(this.player, PokemonFactory.getPokemon(selectedRarity)));
             }
+            else
+                setupControls();
+        }
+        else
+            setupControls();
+    }
+
+
+
+
+
+
+
+    private final class WalkNorthAnimation extends AnimationTimer
+    {
+        private double yChange;
+
+        private int frames;
+        private int cameraXSnapshot;
+        private int cameraYSnapshot;
+
+
+        private WalkNorthAnimation ()
+        {
+            getScene().setOnKeyPressed(null);
+            this.frames = 0;
+            this.yChange = 0.0;
+            this.cameraXSnapshot = cameraX;
+            this.cameraYSnapshot = cameraY;
+        }
+
+
+        @Override
+        public void handle (long now)
+        {
+            this.frames++;
+            if (this.yChange < 1.0)
+                this.yChange += MOVEMENT_SPEED;
+            else
+            {
+                this.stop();
+                cameraY--;
+                player.getPosition().setY(player.getPosition().getY()-1);
+                checkForWildEncounter();
+            }
+            for (int y = -1; y < CAMERA_Y_RANGE; y++)
+            {
+                for (int x = 0; x < CAMERA_X_RANGE; x++)
+                {
+                    getPaintBrush().drawImage(tileImages,
+                            (map.getTile(cameraYSnapshot+y, cameraXSnapshot+x).getID()%3)*32,
+                            (map.getTile(cameraYSnapshot+y, cameraXSnapshot+x).getID()/3)*32,
+                            32, 32,
+                            x*TILE_SIZE, (y*TILE_SIZE)+(yChange*TILE_SIZE), TILE_SIZE, TILE_SIZE);
+                }
+            }
+            playerX = this.frames < 11 ? 1 : this.frames < 21 ? 2 : 0;
+            getPaintBrush().drawImage(playerImages,
+                    playerX*32, playerY*32,
+                    32,32, PLAYER_X_OFFSET*TILE_SIZE, PLAYER_Y_OFFSET*TILE_SIZE,
+                    TILE_SIZE, TILE_SIZE);
         }
     }
 
 
+
+
+
+
+
+    private final class WalkEastAnimation extends AnimationTimer
+    {
+        private double xChange;
+
+        private int frames;
+        private int cameraXSnapshot;
+        private int cameraYSnapshot;
+
+
+        private WalkEastAnimation ()
+        {
+            getScene().setOnKeyPressed(null);
+            this.frames = 0;
+            this.xChange = 0.0;
+            this.cameraXSnapshot = cameraX;
+            this.cameraYSnapshot = cameraY;
+        }
+
+
+        @Override
+        public void handle (long now)
+        {
+            this.frames++;
+            if (this.xChange < 1.0)
+                this.xChange += MOVEMENT_SPEED;
+            else
+            {
+                this.stop();
+                cameraX++;
+                player.getPosition().setX(player.getPosition().getX()+1);
+                checkForWildEncounter();
+            }
+            for (int y = 0; y < CAMERA_Y_RANGE; y++)
+            {
+                for (int x = 0; x < CAMERA_X_RANGE+1; x++)
+                {
+                    getPaintBrush().drawImage(tileImages,
+                            (map.getTile(cameraYSnapshot+y, cameraXSnapshot+x).getID()%3)*32,
+                            (map.getTile(cameraYSnapshot+y, cameraXSnapshot+x).getID()/3)*32,
+                            32, 32,
+                            (x*TILE_SIZE)-(xChange*TILE_SIZE), y*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                }
+            }
+            playerX = this.frames < 11 ? 1 : this.frames < 21 ? 2 : 0;
+            getPaintBrush().drawImage(playerImages,
+                    playerX*32, playerY*32,
+                    32,32, PLAYER_X_OFFSET*TILE_SIZE, PLAYER_Y_OFFSET*TILE_SIZE,
+                    TILE_SIZE, TILE_SIZE);
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+    private final class WalkSouthAnimation extends AnimationTimer
+    {
+        private double yChange;
+
+        private int frames;
+        private int cameraXSnapshot;
+        private int cameraYSnapshot;
+
+
+        private WalkSouthAnimation ()
+        {
+            getScene().setOnKeyPressed(null);
+            this.frames = 0;
+            this.yChange = 0.0;
+            this.cameraXSnapshot = cameraX;
+            this.cameraYSnapshot = cameraY;
+        }
+
+
+        @Override
+        public void handle (long now)
+        {
+            this.frames++;
+            if (this.yChange < 1.0)
+                this.yChange += MOVEMENT_SPEED;
+            else
+            {
+                this.stop();
+                cameraY++;
+                player.getPosition().setY(player.getPosition().getY()+1);
+                checkForWildEncounter();
+            }
+            for (int y = 0; y < CAMERA_Y_RANGE+1; y++)
+            {
+                for (int x = 0; x < CAMERA_X_RANGE; x++)
+                {
+                    getPaintBrush().drawImage(tileImages,
+                            (map.getTile(cameraYSnapshot+y, cameraXSnapshot+x).getID()%3)*32,
+                            (map.getTile(cameraYSnapshot+y, cameraXSnapshot+x).getID()/3)*32,
+                            32, 32,
+                            x*TILE_SIZE, (y*TILE_SIZE)-(yChange*TILE_SIZE), TILE_SIZE, TILE_SIZE);
+                }
+            }
+            playerX = this.frames < 11 ? 1 : this.frames < 21 ? 2 : 0;
+            getPaintBrush().drawImage(playerImages,
+                    playerX*32, playerY*32,
+                    32,32, PLAYER_X_OFFSET*TILE_SIZE, PLAYER_Y_OFFSET*TILE_SIZE,
+                    TILE_SIZE, TILE_SIZE);
+
+        }
+    }
+
+
+
+
+
+
+    private final class WalkWestAnimation extends AnimationTimer
+    {
+        private double xChange;
+
+        private int frames;
+        private int cameraXSnapshot;
+        private int cameraYSnapshot;
+
+
+        private WalkWestAnimation ()
+        {
+            getScene().setOnKeyPressed(null);
+            this.frames = 0;
+            this.xChange = 0.0;
+            this.cameraXSnapshot = cameraX;
+            this.cameraYSnapshot = cameraY;
+        }
+
+
+        @Override
+        public void handle (long now)
+        {
+            this.frames++;
+            if (this.xChange < 1.0)
+                this.xChange += MOVEMENT_SPEED;
+            else
+            {
+                this.stop();
+                cameraX--;
+                player.getPosition().setX(player.getPosition().getX()-1);
+                checkForWildEncounter();
+            }
+            for (int y = 0; y < CAMERA_Y_RANGE; y++)
+            {
+                for (int x = -1; x < CAMERA_X_RANGE; x++)
+                {
+                    getPaintBrush().drawImage(tileImages,
+                            (map.getTile(cameraYSnapshot+y, cameraXSnapshot+x).getID()%3)*32,
+                            (map.getTile(cameraYSnapshot+y, cameraXSnapshot+x).getID()/3)*32,
+                            32, 32,
+                            (x*TILE_SIZE)+(xChange*TILE_SIZE), y*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                }
+            }
+            playerX = this.frames < 11 ? 1 : this.frames < 21 ? 2 : 0;
+            getPaintBrush().drawImage(playerImages,
+                    playerX*32, playerY*32,
+                    32,32, PLAYER_X_OFFSET*TILE_SIZE, PLAYER_Y_OFFSET*TILE_SIZE,
+                    TILE_SIZE, TILE_SIZE);
+
+        }
+    }
 
 } // final class OverworldScene

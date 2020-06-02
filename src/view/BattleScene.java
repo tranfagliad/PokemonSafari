@@ -69,9 +69,9 @@ public final class BattleScene extends GameScene
     private static final double ARROW_BOTTOM = 636.0;
     private static final double ARROW_LEFT = 475.0;
     private static final double ARROW_RIGHT = 665.0;
-    private static double currArrowX = ARROW_LEFT;
+    private double currArrowX = ARROW_LEFT;
 
-    private static double startNanoTime;
+    private double startNanoTime;
 
     private Image backgroundImage;
     private Image battleBoxImage;
