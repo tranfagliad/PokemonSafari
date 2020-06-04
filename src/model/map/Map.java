@@ -41,7 +41,7 @@ public final class Map
      */
     public AbstractTile getTile (final int row, final int column)
     {
-        return tiles.get(row).get(column);
+        return this.tiles.get(row).get(column);
     } // getTile()
 
 
@@ -53,7 +53,7 @@ public final class Map
      */
     public int getSize ()
     {
-        return tiles.size();
+        return this.tiles.size();
     } // getSize()
 
 
