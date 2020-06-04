@@ -1,5 +1,6 @@
 package model.player;
 
+import model.misc.Position2D;
 import model.pokemon.Pokemon;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public final class Player
      * 30 safari balls, 500 steps remaining, an empty Pokemon list.
      * The initial position of the Player is (0,0).
      */
-    public Player(String name)
+    public Player (final String name)
     {
         this.name = name;
         this.numSafariBalls = INITIAL_NUM_SAFARI_BALLS;

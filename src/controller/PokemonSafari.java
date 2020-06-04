@@ -1,6 +1,7 @@
 package controller;
 
 import controller.audio.CryPlayer;
+import controller.audio.SfxPlayer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -12,6 +13,7 @@ import model.pokemon.PokemonFactory;
 import model.pokemon.Rarity;
 import view.BattleScene;
 import view.GameScene;
+import view.OverworldScene;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -54,8 +56,8 @@ public final class PokemonSafari extends Application
     {
         initWindow(window);
         initMediaPlayers();
-        PokemonSafari.goToNextScene(new BattleScene(new Player("Daniel"), PokemonFactory.getPokemon(Rarity.Uncommon)));
         window.show();
+        PokemonSafari.goToNextScene(new OverworldScene(new Player("Daniel")));
     } // start()
 
 
@@ -87,7 +89,7 @@ public final class PokemonSafari extends Application
     {
         CryPlayer.getInstance();
         //MusicPlayer.getInstance();
-        //SfxPlayer.getInstance();
+        SfxPlayer.getInstance();
     } // initMediaPlayers()
 
 
@@ -124,5 +126,18 @@ public final class PokemonSafari extends Application
         root.getChildren().add(nextScene);
         GameSceneManager.getActiveScene().start();
     } // goToNextScene()
+
+
+    /**
+     * goToPreviousScene()
+     *
+     * Purpose: Returns back to the previous scene.
+     */
+    public static void goToPreviousScene ()
+    {
+        GameSceneManager.removeScene();
+        root.getChildren().remove(root.getChildren().size()-1);
+        GameSceneManager.getActiveScene().start();
+    } // goToPreviousScene()
 
 } // final class PokemonSafari
