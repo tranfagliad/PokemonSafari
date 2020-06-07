@@ -1,6 +1,7 @@
 package controller;
 
 import controller.audio.CryPlayer;
+import controller.audio.MusicPlayer;
 import controller.audio.SfxPlayer;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -9,9 +10,6 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import model.player.Player;
-import model.pokemon.PokemonFactory;
-import model.pokemon.Rarity;
-import view.BattleScene;
 import view.GameScene;
 import view.OverworldScene;
 
@@ -32,7 +30,6 @@ public final class PokemonSafari extends Application
     private static final double WINDOW_HEIGHT = 288 * 2.5;
 
     private static Pane root;
-    private static Scene scene;
 
 
     /**
@@ -69,7 +66,7 @@ public final class PokemonSafari extends Application
     private static void initWindow (Stage window)
     {
         root = new Pane();
-        scene = new Scene(root);
+        final Scene scene = new Scene(root);
         try { window.getIcons().add(new Image(new FileInputStream(ICON_FILENAME))); }
         catch (IOException e) { e.printStackTrace(); }
         window.setTitle(WINDOW_TITLE);
@@ -88,7 +85,7 @@ public final class PokemonSafari extends Application
     private void initMediaPlayers ()
     {
         CryPlayer.getInstance();
-        //MusicPlayer.getInstance();
+        MusicPlayer.getInstance();
         SfxPlayer.getInstance();
     } // initMediaPlayers()
 

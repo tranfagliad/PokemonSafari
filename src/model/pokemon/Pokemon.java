@@ -7,8 +7,8 @@ package model.pokemon;
  */
 public final class Pokemon
 {
-    private static final int MIN_PERCENT = 20;
-    private static final int MAX_PERCENT = 80;
+    private static final int MIN_PERCENT = 10;
+    private static final int MAX_PERCENT = 90;
 
     private int id;
     private String name;
