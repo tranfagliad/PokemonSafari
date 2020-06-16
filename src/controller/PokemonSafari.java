@@ -37,7 +37,7 @@ public final class PokemonSafari extends Application
      *
      * Purpose: Launches the application.
      */
-    public static void main (String[] args)
+    public static void main (final String[] args)
     {
         Application.launch();
     } // main()
@@ -49,7 +49,7 @@ public final class PokemonSafari extends Application
      * Purpose: Initializes and starts the game.
      */
     @Override
-    public void start (Stage window) throws Exception
+    public void start (final Stage window) throws Exception
     {
         initWindow(window);
         initMediaPlayers();
@@ -63,7 +63,7 @@ public final class PokemonSafari extends Application
      *
      * Purpose: Initializes the game window.
      */
-    private static void initWindow (Stage window)
+    private static void initWindow (final Stage window)
     {
         root = new Pane();
         final Scene scene = new Scene(root);
@@ -117,7 +117,7 @@ public final class PokemonSafari extends Application
      *
      * Purpose: Starts the given next scene.
      */
-    public static void goToNextScene (GameScene nextScene)
+    public static void goToNextScene (final GameScene nextScene)
     {
         GameSceneManager.addScene(nextScene);
         root.getChildren().add(nextScene);
@@ -134,7 +134,7 @@ public final class PokemonSafari extends Application
     {
         GameSceneManager.removeScene();
         root.getChildren().remove(root.getChildren().size()-1);
-        GameSceneManager.getActiveScene().start();
+        GameSceneManager.getActiveScene().restart();
     } // goToPreviousScene()
 
 } // final class PokemonSafari

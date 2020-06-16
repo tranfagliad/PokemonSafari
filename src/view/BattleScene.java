@@ -1,5 +1,6 @@
 package view;
 
+import controller.GameSceneManager;
 import controller.PokemonSafari;
 import controller.audio.*;
 import javafx.animation.AnimationTimer;
@@ -138,6 +139,14 @@ public final class BattleScene extends GameScene
 
 
     /**
+     * restart()
+     *
+     * Purpose: Not used.
+     */
+    @Override
+    public void restart () { /* Nothing */ };
+
+    /**
      * transition()
      *
      * Purpose: Runs the transition animation when a battle starts.
@@ -183,6 +192,8 @@ public final class BattleScene extends GameScene
                     getPaintBrush().setEffect(colorAdjust);
                     CryPlayer.getInstance().play(wildPokemon.getName());
                     getPaintBrush().setFill(Color.WHITE);
+                    GameSceneManager.getPreviousScene().getPaintBrush().setFill(Color.BLACK);
+                    GameSceneManager.getPreviousScene().getPaintBrush().fillRect(0,0,getWidth(),getHeight());
                     this.stop();
                     standby();
                     return;

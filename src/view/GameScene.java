@@ -33,6 +33,14 @@ public abstract class GameScene extends Canvas
 
 
     /**
+     * restart()
+     *
+     * Purpose: Defines what will happen when this GameScene is restarted.
+     */
+    public abstract void restart ();
+
+
+    /**
      * getPaintBrush()
      *
      * Purpose: Returns the GraphicsContext of the canvas to allow drawing.

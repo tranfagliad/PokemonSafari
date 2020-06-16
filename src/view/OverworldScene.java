@@ -5,6 +5,7 @@ import controller.audio.SfxLibrary;
 import controller.audio.SfxPlayer;
 import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
@@ -36,6 +37,8 @@ public final class OverworldScene extends GameScene
     private static final Font MEDIUM_FONT = Font.font("Verdana", 28);
     private static final Font BIG_FONT = Font.font("Verdana", 35);
 
+    private static final double DEFAULT_BRIGHTNESS = 0.0;
+    private static final double BLACK_SCREEN_BRIGHTNESS = -1.0;
     private static final double MOVEMENT_SPEED = 0.05;
 
     private static final int ONE_HUNDRED_PERCENT = 100;
@@ -49,6 +52,9 @@ public final class OverworldScene extends GameScene
     private static final int PLAYER_Y_OFFSET = 4;
 
 
+    private static boolean returningFromBattle = false;
+
+
     private Image playerImages;
     private Image tileImages;
     private Image overworldImages;
@@ -58,13 +64,18 @@ public final class OverworldScene extends GameScene
 
     private int cameraX;
     private int cameraY;
-
     private int menuItemID;
 
     private double playerX;
     private double playerY;
+    private double arrowX;
 
 
+    /**
+     * OverworldScene (Player)
+     *
+     * Purpose: Initializes the OverworldScene. The given player is set on the map.
+     */
     public OverworldScene (final Player player)
     {
         super();
@@ -89,8 +100,7 @@ public final class OverworldScene extends GameScene
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-    }
+    } // OverworldScene (Player)
 
 
     /**
@@ -106,7 +116,26 @@ public final class OverworldScene extends GameScene
     } // start()
 
 
+    /**
+     * restart()
+     *
+     * Purpose: Defines how the OverworldScene restarts.
+     */
+    @Override
+    public void restart ()
+    {
+        if (returningFromBattle)
+            new TransitionBackFromBattleAnimation().start();
+        else
+            new TransitionBackFromCollectionAnimation().start();
+    } // restart()
 
+
+    /**
+     * drawFrame()
+     *
+     * Purpose: Draws a single frame of the overworld at the current position.
+     */
     private void drawFrame ()
     {
         for (int y = 0; y < CAMERA_Y_RANGE; y++)
@@ -123,11 +152,86 @@ public final class OverworldScene extends GameScene
                 this.playerX*32, this.playerY*32,
                 32,32, PLAYER_X_OFFSET*TILE_SIZE, PLAYER_Y_OFFSET*TILE_SIZE,
                 TILE_SIZE, TILE_SIZE);
-        if (player.getStepsRemaining() == 0)
-            System.exit(0);
-    }
+    } // drawFrame()
 
 
+    /**
+     * TransitionBackFromBattleAnimation
+     *
+     * Purpose: Animation class for returning to the Overworld from Battle.
+     */
+    private final class TransitionBackFromBattleAnimation extends AnimationTimer
+    {
+        private final ColorAdjust colorAdjust = new ColorAdjust();
+
+        private double screenBrightness;
+
+        private TransitionBackFromBattleAnimation ()
+        {
+            this.screenBrightness = BLACK_SCREEN_BRIGHTNESS;
+        }
+
+
+        @Override
+        public void handle (final long now)
+        {
+            if (this.screenBrightness < DEFAULT_BRIGHTNESS)
+            {
+                this.screenBrightness += 0.04;
+                this.colorAdjust.setBrightness(this.screenBrightness);
+                getPaintBrush().setEffect(this.colorAdjust);
+                drawFrame();
+            }
+            else {
+                this.stop();
+                returningFromBattle = false;
+                overworldControls();
+            }
+        }
+    } // final class TransitionBackFromBattleAnimation
+
+
+    /**
+     * TransitionBackFromCollectionAnimation
+     *
+     * Purpose: Animation class for returning to the Overworld from Collection.
+     */
+    private final class TransitionBackFromCollectionAnimation extends AnimationTimer
+    {
+        private final ColorAdjust colorAdjust = new ColorAdjust();
+
+        private double screenBrightness;
+
+        private TransitionBackFromCollectionAnimation ()
+        {
+            this.screenBrightness = BLACK_SCREEN_BRIGHTNESS;
+        }
+
+
+        @Override
+        public void handle (final long now)
+        {
+            if (this.screenBrightness < DEFAULT_BRIGHTNESS)
+            {
+                this.screenBrightness += 0.04;
+                this.colorAdjust.setBrightness(this.screenBrightness);
+                getPaintBrush().setEffect(this.colorAdjust);
+                drawFrame();
+                drawMenu();
+            }
+            else {
+                this.stop();
+                menuControls();
+            }
+        }
+    } // final class TransitionBackFromCollectionAnimation
+
+
+    /**
+     * overworldControls()
+     *
+     * Purpose: Sets the scene controls to the overworld for walking.
+     */
     private void overworldControls ()
     {
         this.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -139,37 +243,29 @@ public final class OverworldScene extends GameScene
                     case W:
                         playerX = 0;
                         playerY = 0;
-                        if (map.getTile(player.getPosition().getY()-1, player.getPosition().getX()).isWalkable()) {
-                            player.setStepsRemaining(player.getStepsRemaining()-1);
+                        if (map.getTile(player.getPosition().getY()-1, player.getPosition().getX()).isWalkable())
                             new WalkNorthAnimation().start();
-                        }
                         drawFrame();
                         break;
                     case A:
                         playerX = 0;
                         playerY = 1;
-                        if (map.getTile(player.getPosition().getY(), player.getPosition().getX()-1).isWalkable()) {
-                            player.setStepsRemaining(player.getStepsRemaining()-1);
+                        if (map.getTile(player.getPosition().getY(), player.getPosition().getX()-1).isWalkable())
                             new WalkWestAnimation().start();
-                        }
                         drawFrame();
                         break;
                     case S:
                         playerX = 0;
                         playerY = 2;
-                        if (map.getTile(player.getPosition().getY()+1, player.getPosition().getX()).isWalkable()) {
-                            player.setStepsRemaining(player.getStepsRemaining()-1);
+                        if (map.getTile(player.getPosition().getY()+1, player.getPosition().getX()).isWalkable())
                             new WalkSouthAnimation().start();
-                        }
                         drawFrame();
                         break;
                     case D:
                         playerX = 0;
                         playerY = 3;
-                        if (map.getTile(player.getPosition().getY(), player.getPosition().getX()+1).isWalkable()) {
-                            player.setStepsRemaining(player.getStepsRemaining()-1);
+                        if (map.getTile(player.getPosition().getY(), player.getPosition().getX()+1).isWalkable())
                             new WalkEastAnimation().start();
-                        }
                         drawFrame();
                         break;
                     case ENTER:
@@ -179,9 +275,15 @@ public final class OverworldScene extends GameScene
                 }
             }
         });
-    }
+        checkEndCondition();
+    } // overworldControls()
 
 
+    /**
+     * menuControls()
+     *
+     * Purpose: Sets the scene controls to the menu when the menu is opened.
+     */
     private void menuControls ()
     {
         final MenuArrowAnimation menuArrowAnimation = new MenuArrowAnimation();
@@ -206,7 +308,14 @@ public final class OverworldScene extends GameScene
                         }
                         break;
                     case SPACE:
-                        if (menuItemID == 1)
+                        if (menuItemID == 0)
+                        {
+                            SfxPlayer.getInstance().play(SfxLibrary.Select.name());
+                            getScene().setOnKeyPressed(null);
+                            menuArrowAnimation.stop();
+                            new TransitionToCollectionAnimation().start();
+                        }
+                        else if (menuItemID == 1)
                         {
                             SfxPlayer.getInstance().play(SfxLibrary.Select.name());
                             drawFrame();
@@ -223,9 +332,15 @@ public final class OverworldScene extends GameScene
                 }
             }
         });
-    }
+    } // menuControls()
 
 
+    /**
+     * checkForWildEncounter()
+     *
+     * Purpose: Checks if a wild encounter can take place at the current tile.
+     *      If so, the BattleScene is entered.
+     */
     private void checkForWildEncounter ()
     {
         if (this.map.getTile(player.getPosition().getY(), player.getPosition().getX()).canEncounterPokemon())
@@ -243,6 +358,7 @@ public final class OverworldScene extends GameScene
                     selectedRarity = Rarity.Uncommon;
                 else
                     selectedRarity = Rarity.Rare;
+                returningFromBattle = true;
                 PokemonSafari.goToNextScene(new BattleScene(this.player, PokemonFactory.getPokemon(selectedRarity)));
             }
             else
@@ -250,9 +366,14 @@ public final class OverworldScene extends GameScene
         }
         else
             overworldControls();
-    }
+    } // checkForWildEncounter()
 
 
+    /**
+     * WalkNorthAnimation
+     *
+     * Purpose: Animation class for walking North.
+     */
     private final class WalkNorthAnimation extends AnimationTimer
     {
         private double yChange;
@@ -273,7 +394,7 @@ public final class OverworldScene extends GameScene
 
 
         @Override
-        public void handle (long now)
+        public void handle (final long now)
         {
             this.frames++;
             if (this.yChange < 1.0)
@@ -283,6 +404,7 @@ public final class OverworldScene extends GameScene
                 this.stop();
                 cameraY--;
                 player.getPosition().setY(player.getPosition().getY()-1);
+                player.setStepsRemaining(player.getStepsRemaining()-1);
                 checkForWildEncounter();
             }
             for (int y = -1; y < CAMERA_Y_RANGE; y++)
@@ -293,7 +415,7 @@ public final class OverworldScene extends GameScene
                             (map.getTile(cameraYSnapshot+y, cameraXSnapshot+x).getID()%3)*64,
                             (map.getTile(cameraYSnapshot+y, cameraXSnapshot+x).getID()/3)*64,
                             32, 32,
-                            x*TILE_SIZE, (y*TILE_SIZE)+(yChange*TILE_SIZE), TILE_SIZE, TILE_SIZE);
+                            x*TILE_SIZE, (y*TILE_SIZE)+(yChange*TILE_SIZE), TILE_SIZE+1, TILE_SIZE+1);
                 }
             }
             playerX = this.frames < 11 ? 1 : this.frames < 21 ? 2 : 0;
@@ -302,9 +424,14 @@ public final class OverworldScene extends GameScene
                     32,32, PLAYER_X_OFFSET*TILE_SIZE, PLAYER_Y_OFFSET*TILE_SIZE,
                     TILE_SIZE, TILE_SIZE);
         }
-    }
+    } // final class WalkNorthAnimation
 
 
+    /**
+     * WalkEastAnimation
+     *
+     * Purpose: Animation class for walking East.
+     */
     private final class WalkEastAnimation extends AnimationTimer
     {
         private double xChange;
@@ -325,7 +452,7 @@ public final class OverworldScene extends GameScene
 
 
         @Override
-        public void handle (long now)
+        public void handle (final long now)
         {
             this.frames++;
             if (this.xChange < 1.0)
@@ -335,6 +462,7 @@ public final class OverworldScene extends GameScene
                 this.stop();
                 cameraX++;
                 player.getPosition().setX(player.getPosition().getX()+1);
+                player.setStepsRemaining(player.getStepsRemaining()-1);
                 checkForWildEncounter();
             }
             for (int y = 0; y < CAMERA_Y_RANGE; y++)
@@ -345,7 +473,7 @@ public final class OverworldScene extends GameScene
                             (map.getTile(cameraYSnapshot+y, cameraXSnapshot+x).getID()%3)*64,
                             (map.getTile(cameraYSnapshot+y, cameraXSnapshot+x).getID()/3)*64,
                             32, 32,
-                            (x*TILE_SIZE)-(xChange*TILE_SIZE), y*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                            (x*TILE_SIZE)-(xChange*TILE_SIZE), y*TILE_SIZE, TILE_SIZE+1, TILE_SIZE+1);
                 }
             }
             playerX = this.frames < 11 ? 1 : this.frames < 21 ? 2 : 0;
@@ -354,9 +482,14 @@ public final class OverworldScene extends GameScene
                     32,32, PLAYER_X_OFFSET*TILE_SIZE, PLAYER_Y_OFFSET*TILE_SIZE,
                     TILE_SIZE, TILE_SIZE);
         }
-    }
+    } // final class WalkEastAnimation
 
 
+    /**
+     * WalkSouthAnimation
+     *
+     * Purpose: Animation class for walking South.
+     */
     private final class WalkSouthAnimation extends AnimationTimer
     {
         private double yChange;
@@ -377,7 +510,7 @@ public final class OverworldScene extends GameScene
 
 
         @Override
-        public void handle (long now)
+        public void handle (final long now)
         {
             this.frames++;
             if (this.yChange < 1.0)
@@ -387,6 +520,7 @@ public final class OverworldScene extends GameScene
                 this.stop();
                 cameraY++;
                 player.getPosition().setY(player.getPosition().getY()+1);
+                player.setStepsRemaining(player.getStepsRemaining()-1);
                 checkForWildEncounter();
             }
             for (int y = 0; y < CAMERA_Y_RANGE+1; y++)
@@ -397,7 +531,7 @@ public final class OverworldScene extends GameScene
                             (map.getTile(cameraYSnapshot+y, cameraXSnapshot+x).getID()%3)*64,
                             (map.getTile(cameraYSnapshot+y, cameraXSnapshot+x).getID()/3)*64,
                             32, 32,
-                            x*TILE_SIZE, (y*TILE_SIZE)-(yChange*TILE_SIZE), TILE_SIZE, TILE_SIZE);
+                            x*TILE_SIZE, (y*TILE_SIZE)-(yChange*TILE_SIZE), TILE_SIZE+1, TILE_SIZE+1);
                 }
             }
             playerX = this.frames < 11 ? 1 : this.frames < 21 ? 2 : 0;
@@ -406,9 +540,14 @@ public final class OverworldScene extends GameScene
                     32,32, PLAYER_X_OFFSET*TILE_SIZE, PLAYER_Y_OFFSET*TILE_SIZE,
                     TILE_SIZE, TILE_SIZE);
         }
-    }
+    } // final class WalkSouthAnimation
 
 
+    /**
+     * WalkWestAnimation
+     *
+     * Purpose: Animation class for walking West.
+     */
     private final class WalkWestAnimation extends AnimationTimer
     {
         private double xChange;
@@ -439,6 +578,7 @@ public final class OverworldScene extends GameScene
                 this.stop();
                 cameraX--;
                 player.getPosition().setX(player.getPosition().getX()-1);
+                player.setStepsRemaining(player.getStepsRemaining()-1);
                 checkForWildEncounter();
             }
             for (int y = 0; y < CAMERA_Y_RANGE; y++)
@@ -449,7 +589,7 @@ public final class OverworldScene extends GameScene
                             (map.getTile(cameraYSnapshot+y, cameraXSnapshot+x).getID()%3)*64,
                             (map.getTile(cameraYSnapshot+y, cameraXSnapshot+x).getID()/3)*64,
                             32, 32,
-                            (x*TILE_SIZE)+(xChange*TILE_SIZE), y*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                            (x*TILE_SIZE)+(xChange*TILE_SIZE), y*TILE_SIZE, TILE_SIZE+1, TILE_SIZE+1);
                 }
             }
             playerX = this.frames < 11 ? 1 : this.frames < 21 ? 2 : 0;
@@ -458,9 +598,14 @@ public final class OverworldScene extends GameScene
                     32,32, PLAYER_X_OFFSET*TILE_SIZE, PLAYER_Y_OFFSET*TILE_SIZE,
                     TILE_SIZE, TILE_SIZE);
         }
-    }
+    } // final class WalkWestAnimation
 
 
+    /**
+     * drawMenu()
+     *
+     * Purpose: Draws a single frame of the menu.
+     */
     private void drawMenu ()
     {
         getPaintBrush().setFill(Color.WHITE);
@@ -485,16 +630,22 @@ public final class OverworldScene extends GameScene
         getPaintBrush().setFont(MEDIUM_FONT);
         getPaintBrush().fillText("See Collection", 610, 180);
         getPaintBrush().fillText("Close", 610, 220);
-    }
+    } // drawMenu()
 
 
+    /**
+     * MenuArrowAnimation
+     *
+     * Purpose: Animation class for the menu arrow while in the menu.
+     */
     private final class MenuArrowAnimation extends AnimationTimer
     {
         private double arrowXPush = 0;
         private boolean arrowGoingRight;
 
+
         @Override
-        public void handle (long now)
+        public void handle (final long now)
         {
             drawFrame();
             drawMenu();
@@ -503,12 +654,92 @@ public final class OverworldScene extends GameScene
             else if (this.arrowXPush < 0)
                 this.arrowGoingRight = true;
             if (this.arrowGoingRight)
-                this.arrowXPush += 0.2;
+                this.arrowXPush += 0.4;
             else
-                this.arrowXPush -= 0.2;
+                this.arrowXPush -= 0.4;
+            arrowX = 560 + this.arrowXPush;
             getPaintBrush().drawImage(overworldImages, 0, 0, 32, 32,
-                    560+this.arrowXPush, 155+(menuItemID*40), 32, 32);
+                    arrowX, 155+(menuItemID*40), 32, 32);
         }
-    }
+    } // final class MenuArrowAnimation
+
+
+    /**
+     * TransitionToCollectionAnimation
+     *
+     * Purpose: Animation class for the transition to the CollectionScene.
+     */
+    private final class TransitionToCollectionAnimation extends AnimationTimer
+    {
+        private final ColorAdjust colorAdjust = new ColorAdjust();
+
+        private double screenBrightness = DEFAULT_BRIGHTNESS;
+
+
+        @Override
+        public void handle (final long now)
+        {
+            if (this.screenBrightness > BLACK_SCREEN_BRIGHTNESS) {
+                this.screenBrightness -= 0.04;
+                this.colorAdjust.setBrightness(this.screenBrightness);
+                getPaintBrush().setEffect(this.colorAdjust);
+            }
+            else
+            {
+                this.stop();
+                PokemonSafari.goToNextScene(new CollectionScene(player.getPokemonCaught()));
+            }
+            drawFrame();
+            drawMenu();
+            getPaintBrush().drawImage(overworldImages, 0, 0, 32, 32,
+                    arrowX, 155+(menuItemID*40), 32, 32);
+        }
+    } // final class TransitionToCollectionAnimation
+
+
+    /**
+     * checkEndCondition()
+     *
+     * Purpose: Checks if the player ran out of steps, and if so, the game
+     *      proceeds to the EndGameScene.
+     */
+    private void checkEndCondition ()
+    {
+        if (this.player.getStepsRemaining() == 0)
+        {
+            this.getScene().setOnKeyPressed(null);
+            new TransitionToEndAnimation().start();
+        }
+    } // checkEndCondition()
+
+
+    /**
+     * TransitionToEndAnimation
+     *
+     * Purpose: Animation class to transition to the EndGameScene.
+     */
+    private final class TransitionToEndAnimation extends AnimationTimer
+    {
+        private final ColorAdjust colorAdjust = new ColorAdjust();
+
+        private double screenBrightness = DEFAULT_BRIGHTNESS;
+
+
+        @Override
+        public void handle (final long now)
+        {
+            if (this.screenBrightness > BLACK_SCREEN_BRIGHTNESS) {
+                this.screenBrightness -= 0.04;
+                this.colorAdjust.setBrightness(this.screenBrightness);
+                getPaintBrush().setEffect(this.colorAdjust);
+            }
+            else
+            {
+                this.stop();
+                PokemonSafari.goToNextScene(new EndGameScene());
+            }
+            drawFrame();
+        }
+    } // final class TransitionToEndAnimation
 
 } // final class OverworldScene

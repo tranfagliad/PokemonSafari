@@ -18,6 +18,7 @@ public final class Pokemon
     private int catchLikelihood;
     private int runLikelihood;
     private int maxDuration;
+    private Rarity rarity;
 
 
     /**
@@ -25,8 +26,8 @@ public final class Pokemon
      *
      * Purpose: Creates a new Pokemon with the given parameters.
      */
-    public Pokemon(int id, String name, int hp, int level, Gender gender,
-                   int catchLikelihood, int runLikelihood, int maxDuration)
+    public Pokemon(final int id, final String name, final int hp, final int level, final Gender gender,
+                   final int catchLikelihood, final int runLikelihood, final int maxDuration, final Rarity rarity)
     {
         this.id = id;
         this.name = name;
@@ -36,6 +37,7 @@ public final class Pokemon
         this.setCatchLikelihood(catchLikelihood);
         this.setRunLikelihood(runLikelihood);
         this.maxDuration = maxDuration;
+        this.rarity = rarity;
     } // Pokemon (String, int, int, int)
 
 
@@ -153,6 +155,17 @@ public final class Pokemon
     {
         return this.maxDuration;
     } // getMaxDuration()
+
+
+    /**
+     * getRarity()
+     *
+     * Purpose: Returns the rarity rating of the Pokemon.
+     */
+    public Rarity getRarity ()
+    {
+        return this.rarity;
+    } // getRarity()
 
 
     /**

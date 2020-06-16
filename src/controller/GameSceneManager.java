@@ -27,6 +27,18 @@ public final class GameSceneManager
 
 
     /**
+     * getPreviousScene()
+     *
+     * Purpose: If there are at least 2 scenes in the stack, the size()-2 scene is returned.
+     *      Otherwise, null is returned.
+     */
+    public static GameScene getPreviousScene ()
+    {
+        return scenes.size() > 1 ? scenes.get(scenes.size()-2) : null;
+    } // getPreviousScene()
+
+
+    /**
      * addScene()
      *
      * Purpose: Pushes a new GameScene to the stack of scenes.
