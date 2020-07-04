@@ -14,6 +14,7 @@ public abstract class AbstractMediaPlayer
 {
     private static final String FILE_FORMAT = ".wav";
 
+    private AudioClip audioClip = null;
     private String filepath;
 
 
@@ -36,7 +37,7 @@ public abstract class AbstractMediaPlayer
      */
     public void play (final String audioFilename)
     {
-        final AudioClip audioClip = new AudioClip(Paths.get(this.filepath+audioFilename+FILE_FORMAT).toUri().toString());
+        audioClip = new AudioClip(Paths.get(this.filepath + audioFilename + FILE_FORMAT).toUri().toString());
         audioClip.setCycleCount(1);
         audioClip.play();
     } // play()
@@ -49,9 +50,21 @@ public abstract class AbstractMediaPlayer
      */
     public void loop (final String audioFilename)
     {
-        final AudioClip audioClip = new AudioClip(Paths.get(this.filepath+audioFilename+FILE_FORMAT).toUri().toString());
+        audioClip = new AudioClip(Paths.get(this.filepath + audioFilename + FILE_FORMAT).toUri().toString());
         audioClip.setCycleCount(AudioClip.INDEFINITE);
         audioClip.play();
     } // loop()
+
+
+    /**
+     * stop()
+     *
+     * Purpose: Stops the audio if it is running.
+     */
+    public void stop ()
+    {
+        if (audioClip != null)
+            audioClip.stop();
+    } // stop()
 
 } // abstract class AbstractMediaPlayer

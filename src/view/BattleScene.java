@@ -1,9 +1,8 @@
 package view;
 
+import controller.GameSceneManager;
 import controller.PokemonSafari;
-import controller.audio.CryPlayer;
-import controller.audio.SfxLibrary;
-import controller.audio.SfxPlayer;
+import controller.audio.*;
 import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
 import javafx.scene.effect.ColorAdjust;
@@ -140,6 +139,14 @@ public final class BattleScene extends GameScene
 
 
     /**
+     * restart()
+     *
+     * Purpose: Not used.
+     */
+    @Override
+    public void restart () { /* Nothing */ };
+
+    /**
      * transition()
      *
      * Purpose: Runs the transition animation when a battle starts.
@@ -185,6 +192,8 @@ public final class BattleScene extends GameScene
                     getPaintBrush().setEffect(colorAdjust);
                     CryPlayer.getInstance().play(wildPokemon.getName());
                     getPaintBrush().setFill(Color.WHITE);
+                    GameSceneManager.getPreviousScene().getPaintBrush().setFill(Color.BLACK);
+                    GameSceneManager.getPreviousScene().getPaintBrush().fillRect(0,0,getWidth(),getHeight());
                     this.stop();
                     standby();
                     return;
@@ -655,8 +664,10 @@ public final class BattleScene extends GameScene
         public void handle (final long now)
         {
             super.handle(now);
-            if (this.throwComplete)
+            if (this.throwComplete) {
+                SfxPlayer.getInstance().play(SfxLibrary.Pokeball_Contact.name());
                 new CatchPokemonAnimationA(super.itemX, super.itemY).start();
+            }
         }
 
     } // final class ThrowSafariBallAnimation
@@ -759,6 +770,7 @@ public final class BattleScene extends GameScene
             }
             else {
                 this.stop();
+                SfxPlayer.getInstance().play(SfxLibrary.Pokeball_Contact.name());
                 new CatchPokemonAnimationC(this.itemX, this.itemY).start();
             }
         }
@@ -1136,8 +1148,10 @@ public final class BattleScene extends GameScene
         public void handle (final long now)
         {
             super.handle(now);
-            if (this.throwComplete)
+            if (this.throwComplete) {
+                SfxPlayer.getInstance().play(SfxLibrary.Rock.name());
                 new PokemonHitByRockAnimation().start();
+            }
         }
 
     } // final class ThrowRockAnimation

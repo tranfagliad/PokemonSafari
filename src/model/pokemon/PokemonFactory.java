@@ -29,7 +29,7 @@ public final class PokemonFactory
         final String filename = "data/pokemon/" + (rarity == Rarity.Common ? "Common" : rarity == Rarity.Uncommon ? "Uncommon" : "Rare") + ".txt";
         final int maxLines = (rarity == Rarity.Common ? NUM_COMMON : rarity == Rarity.Uncommon ? NUM_UNCOMMON : NUM_RARE);
         final String pokemonLine = getPokemonLine(filename, maxLines);
-        return createPokemon(pokemonLine.split(", "));
+        return createPokemon(pokemonLine.split(", "), rarity);
     } // getPokemon
 
 
@@ -63,7 +63,7 @@ public final class PokemonFactory
      * Purpose: Given an array of Pokemon data, the data is parsed, and a Pokemon
      *      object is created with a random level and gender, then returned.
      */
-    private static Pokemon createPokemon (final String[] pokemonInfo)
+    private static Pokemon createPokemon (final String[] pokemonInfo, final Rarity rarity)
     {
         final Random r = new Random();
         final int id = Integer.parseInt(pokemonInfo[0]);
@@ -74,7 +74,7 @@ public final class PokemonFactory
         final int runPercent = Integer.parseInt(pokemonInfo[4]);
         final int maxDuration = Integer.parseInt(pokemonInfo[5]);
         final Gender gender = r.nextInt(2) == 0 ? Gender.Male : Gender.Female;
-        return new Pokemon(id, name, hp, level, gender, catchPercent, runPercent, maxDuration);
+        return new Pokemon(id, name, hp, level, gender, catchPercent, runPercent, maxDuration, rarity);
     } // createPokemon()
 
 

@@ -1,6 +1,7 @@
 package controller;
 
 import controller.audio.CryPlayer;
+import controller.audio.MusicPlayer;
 import controller.audio.SfxPlayer;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -9,10 +10,8 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import model.player.Player;
-import model.pokemon.PokemonFactory;
-import model.pokemon.Rarity;
-import view.BattleScene;
 import view.GameScene;
+import view.NameEntryScene;
 import view.OverworldScene;
 
 import java.io.FileInputStream;
@@ -32,7 +31,6 @@ public final class PokemonSafari extends Application
     private static final double WINDOW_HEIGHT = 288 * 2.5;
 
     private static Pane root;
-    private static Scene scene;
 
 
     /**
@@ -40,7 +38,7 @@ public final class PokemonSafari extends Application
      *
      * Purpose: Launches the application.
      */
-    public static void main (String[] args)
+    public static void main (final String[] args)
     {
         Application.launch();
     } // main()
@@ -52,12 +50,12 @@ public final class PokemonSafari extends Application
      * Purpose: Initializes and starts the game.
      */
     @Override
-    public void start (Stage window) throws Exception
+    public void start (final Stage window) throws Exception
     {
         initWindow(window);
         initMediaPlayers();
         window.show();
-        PokemonSafari.goToNextScene(new OverworldScene(new Player("Daniel")));
+        PokemonSafari.goToNextScene(new OverworldScene(new Player("you")));
     } // start()
 
 
@@ -66,10 +64,10 @@ public final class PokemonSafari extends Application
      *
      * Purpose: Initializes the game window.
      */
-    private static void initWindow (Stage window)
+    private static void initWindow (final Stage window)
     {
         root = new Pane();
-        scene = new Scene(root);
+        final Scene scene = new Scene(root);
         try { window.getIcons().add(new Image(new FileInputStream(ICON_FILENAME))); }
         catch (IOException e) { e.printStackTrace(); }
         window.setTitle(WINDOW_TITLE);
@@ -88,7 +86,7 @@ public final class PokemonSafari extends Application
     private void initMediaPlayers ()
     {
         CryPlayer.getInstance();
-        //MusicPlayer.getInstance();
+        MusicPlayer.getInstance();
         SfxPlayer.getInstance();
     } // initMediaPlayers()
 
@@ -120,7 +118,7 @@ public final class PokemonSafari extends Application
      *
      * Purpose: Starts the given next scene.
      */
-    public static void goToNextScene (GameScene nextScene)
+    public static void goToNextScene (final GameScene nextScene)
     {
         GameSceneManager.addScene(nextScene);
         root.getChildren().add(nextScene);
@@ -137,7 +135,7 @@ public final class PokemonSafari extends Application
     {
         GameSceneManager.removeScene();
         root.getChildren().remove(root.getChildren().size()-1);
-        GameSceneManager.getActiveScene().start();
+        GameSceneManager.getActiveScene().restart();
     } // goToPreviousScene()
 
 } // final class PokemonSafari
