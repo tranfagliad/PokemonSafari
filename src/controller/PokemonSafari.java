@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import model.player.Player;
 import view.GameScene;
+import view.NameEntryScene;
 import view.OverworldScene;
 
 import java.io.FileInputStream;
@@ -54,7 +55,7 @@ public final class PokemonSafari extends Application
         initWindow(window);
         initMediaPlayers();
         window.show();
-        PokemonSafari.goToNextScene(new OverworldScene(new Player("Daniel")));
+        PokemonSafari.goToNextScene(new OverworldScene(new Player("you")));
     } // start()
 
 

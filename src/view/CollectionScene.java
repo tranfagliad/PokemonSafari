@@ -62,12 +62,6 @@ public class CollectionScene extends GameScene
     {
         super();
         this.caughtList = caughtList;
-        this.caughtList.add(PokemonFactory.getPokemon(Rarity.Common));
-        this.caughtList.add(PokemonFactory.getPokemon(Rarity.Common));
-        this.caughtList.add(PokemonFactory.getPokemon(Rarity.Uncommon));
-        this.caughtList.add(PokemonFactory.getPokemon(Rarity.Uncommon));
-        this.caughtList.add(PokemonFactory.getPokemon(Rarity.Uncommon));
-        this.caughtList.add(PokemonFactory.getPokemon(Rarity.Rare));
 
         this.barHeightPercent = this.caughtList.size() <= 5 ? 1.0 : 5.0 / this.caughtList.size();
         this.barHeight = MAX_BAR_HEIGHT * this.barHeightPercent;

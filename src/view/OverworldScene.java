@@ -418,6 +418,7 @@ public final class OverworldScene extends GameScene
                             x*TILE_SIZE, (y*TILE_SIZE)+(yChange*TILE_SIZE), TILE_SIZE+1, TILE_SIZE+1);
                 }
             }
+
             playerX = this.frames < 11 ? 1 : this.frames < 21 ? 2 : 0;
             getPaintBrush().drawImage(playerImages,
                     playerX*32, playerY*32,
